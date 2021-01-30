@@ -13,7 +13,7 @@ public class ThreadPooledAtomicParallelMultiplication {
   private static ExecutorService exec =
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-  public void multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C) {
+  public static void multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C) {
     Future f =
         exec.submit(new ThreadPooledAtomicParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -25,7 +25,7 @@ public class ThreadPooledAtomicParallelMultiplication {
   }
 
   @AllArgsConstructor
-  private class ThreadPooledAtomicParallelMultiply implements Runnable {
+  private static class ThreadPooledAtomicParallelMultiply implements Runnable {
     private AtomicMatrix A;
     private AtomicMatrix B;
     private AtomicMatrix C;

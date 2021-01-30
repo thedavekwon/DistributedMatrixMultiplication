@@ -13,7 +13,7 @@ public class ThreadPooledNaiveParallelMultiplication {
   private static ExecutorService exec =
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-  public void multiply(Matrix A, Matrix B, Matrix C) {
+  public static void multiply(Matrix A, Matrix B, Matrix C) {
     Future f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -25,7 +25,7 @@ public class ThreadPooledNaiveParallelMultiplication {
   }
 
   @AllArgsConstructor
-  private class ThreadPooledNaiveParallelMultiply implements Runnable {
+  private static class ThreadPooledNaiveParallelMultiply implements Runnable {
     private Matrix A;
     private Matrix B;
     private Matrix C;
@@ -110,7 +110,7 @@ public class ThreadPooledNaiveParallelMultiplication {
   }
 
   @AllArgsConstructor
-  class SequentialRunner implements Runnable {
+  private static class SequentialRunner implements Runnable {
     private ThreadPooledNaiveParallelMultiply first, second;
 
     public void run() {

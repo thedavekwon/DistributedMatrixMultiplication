@@ -35,7 +35,7 @@ public class App {
 
     C.clear();
     start = new Date();
-    new ThreadPooledNaiveParallelMultiplication().multiply(A, B, C);
+    ThreadPooledNaiveParallelMultiplication.multiply(A, B, C);
     end = new Date();
     System.out.println(A.equals(C));
     System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
@@ -59,7 +59,7 @@ public class App {
 
     // AtomicC.clear();
     // start = new Date();
-    // new ThreadPooledAtomicParallelMultiplication().multiply(AtomicA, AtomicB, AtomicC);
+    // ThreadPooledAtomicParallelMultiplication.multiply(AtomicA, AtomicB, AtomicC);
     // end = new Date();
     // System.out.println(AtomicA.equals(AtomicC));
     // System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
