@@ -8,11 +8,10 @@ import edu.cooper.ece465.threadpool.ThreadPooledNaiveParallelMultiplication;
 import edu.cooper.ece465.threadpool.ThreadPooledParallelMultiplication;
 import edu.cooper.ece465.threads.NaiveAtomicParallelMultiplication;
 import edu.cooper.ece465.threads.ParallelMultiplication;
-import java.util.Date;
 
 public class App {
   public static void main(String[] args) throws InterruptedException {
-    int N = 8;
+    int N = 1024;
 
     // Matrix A = Matrix.createRandomMatrix(N, N);
     // Matrix B = Matrix.createRandomMatrix(N, N);
@@ -20,48 +19,36 @@ public class App {
     Matrix B = Matrix.I(N, N);
     Matrix C = new Matrix(N, N);
 
-    Date start = new Date();
-    SerialMatrixMultiplication.multiply(A, B, C);
-    Date end = new Date();
-    System.out.println(A.equals(C));
-    System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
+    long t1 = SerialMatrixMultiplication.multiply(A, B, C);
+    assert A.equals(C);
+    System.out.println("Time taken in milli seconds: " + t1);
 
     C.clear();
-    start = new Date();
-    ParallelMultiplication.multiply(A, B, C);
-    end = new Date();
-    System.out.println(A.equals(C));
-    System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
+    long t2 = ParallelMultiplication.multiply(A, B, C);
+    assert A.equals(C);
+    System.out.println("Time taken in milli seconds: " + t2);
 
     C.clear();
-    start = new Date();
-    ThreadPooledNaiveParallelMultiplication.multiply(A, B, C);
-    end = new Date();
-    System.out.println(A.equals(C));
-    System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
+    long t3 = ThreadPooledNaiveParallelMultiplication.multiply(A, B, C);
+    assert A.equals(C);
+    System.out.println("Time taken in milli seconds: " + t3);
 
-    // C.clear();
-    // start = new Date();
-    // new ThreadPooledParallelMultiplication().multiply(A, B, C);
-    // end = new Date();
-    // System.out.println(A.equals(C));
-    // System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
+    C.clear();
+    long t4 = ThreadPooledParallelMultiplication.multiply(A, B, C);
+    assert A.equals(C);
+    System.out.println("Time taken in milli seconds: " + t4);
 
-    // AtomicMatrix AtomicA = new AtomicMatrix(A);
-    // AtomicMatrix AtomicB = new AtomicMatrix(B);
-    // AtomicMatrix AtomicC = new AtomicMatrix(new Matrix(N, N));
+    AtomicMatrix AtomicA = new AtomicMatrix(A);
+    AtomicMatrix AtomicB = new AtomicMatrix(B);
+    AtomicMatrix AtomicC = new AtomicMatrix(new Matrix(N, N));
 
-    // start = new Date();
-    // NaiveAtomicParallelMultiplication.multiply(AtomicA, AtomicB, AtomicC);
-    // end = new Date();
-    // System.out.println(AtomicA.equals(AtomicC));
-    // System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
+    long t5 = NaiveAtomicParallelMultiplication.multiply(AtomicA, AtomicB, AtomicC);
+    assert AtomicA.equals(AtomicC);
+    System.out.println("Time taken in milli seconds: " + t5);
 
-    // AtomicC.clear();
-    // start = new Date();
-    // ThreadPooledAtomicParallelMultiplication.multiply(AtomicA, AtomicB, AtomicC);
-    // end = new Date();
-    // System.out.println(AtomicA.equals(AtomicC));
-    // System.out.println("Time taken in milli seconds: " + (end.getTime() - start.getTime()));
+    AtomicC.clear();
+    long t6 = ThreadPooledAtomicParallelMultiplication.multiply(AtomicA, AtomicB, AtomicC);
+    assert AtomicA.equals(AtomicC);
+    System.out.println("Time taken in milli seconds: " + t6);
   }
 }

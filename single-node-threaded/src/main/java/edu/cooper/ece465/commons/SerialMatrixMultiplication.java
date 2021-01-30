@@ -1,8 +1,13 @@
 package edu.cooper.ece465.commons;
 
+import java.util.Date;
+
 public class SerialMatrixMultiplication {
-  public static void multiply(Matrix A, Matrix B, Matrix C) {
+  public static long multiply(Matrix A, Matrix B, Matrix C) {
+    Date start = new Date();
     multiplyWithIndex(A, B, C, 0, 0, 0, 0, 0, 0, A.getRow(), B.getCol(), A.getCol());
+    Date end = new Date();
+    return end.getTime() - start.getTime();
   }
 
   public static void multiplyWithIndex(

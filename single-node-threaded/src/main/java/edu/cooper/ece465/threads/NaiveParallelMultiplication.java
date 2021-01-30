@@ -2,16 +2,17 @@ package edu.cooper.ece465.threads;
 
 import edu.cooper.ece465.commons.Matrix;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 
 public class NaiveParallelMultiplication {
-  private static final int MINIMUM_THRESHOLD = 64;
-
-  public static void multiply(Matrix A, Matrix B, Matrix C)
-      throws InterruptedException {
+  public static long multiply(Matrix A, Matrix B, Matrix C) throws InterruptedException {
+    Date start = new Date();
     Thread t = new Thread(new NaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     t.start();
     t.join();
+    Date end = new Date();
+    return end.getTime() - start.getTime();
   }
 
   @AllArgsConstructor
@@ -22,7 +23,7 @@ public class NaiveParallelMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= MINIMUM_THRESHOLD) {
+      if (size <= A.getRow() / 4) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {
@@ -104,7 +105,6 @@ public class NaiveParallelMultiplication {
           try {
             thread.join();
           } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
           }
         }

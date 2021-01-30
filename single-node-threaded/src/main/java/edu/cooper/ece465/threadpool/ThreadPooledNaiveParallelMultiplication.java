@@ -2,26 +2,31 @@ package edu.cooper.ece465.threadpool;
 
 import edu.cooper.ece465.commons.Matrix;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import lombok.AllArgsConstructor;
+import org.apache.log4j.Logger;
 
 public class ThreadPooledNaiveParallelMultiplication {
-  private static final int MINIMUM_THRESHOLD = 64;
+  private static final Logger LOG = Logger.getLogger(ThreadPooledNaiveParallelMultiplication.class);
   private static ExecutorService exec =
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-  public static void multiply(Matrix A, Matrix B, Matrix C) {
-    Future f =
+  public static long multiply(Matrix A, Matrix B, Matrix C) {
+    Date start = new Date();
+    Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
       f.get();
       exec.shutdown();
     } catch (Exception e) {
-
+      LOG.info(e);
     }
+    Date end = new Date();
+    return end.getTime() - start.getTime();
   }
 
   @AllArgsConstructor
@@ -32,7 +37,7 @@ public class ThreadPooledNaiveParallelMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= MINIMUM_THRESHOLD) {
+      if (size <= A.getRow() / 4) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {
@@ -91,15 +96,15 @@ public class ThreadPooledNaiveParallelMultiplication {
                   C_j + newSize,
                   newSize)
             };
-        FutureTask[] fs = new FutureTask[tasks.length / 2];
+        FutureTask<?>[] fs = new FutureTask[tasks.length / 2];
         for (int i = 0; i < tasks.length; i += 2) {
-          fs[i / 2] = new FutureTask(new SequentialRunner(tasks[i], tasks[i + 1]), null);
+          fs[i / 2] = new FutureTask<Void>(new SequentialRunner(tasks[i], tasks[i + 1]), null);
           exec.execute(fs[i / 2]);
         }
-        for (FutureTask f : fs) {
+        for (FutureTask<?> f : fs) {
           f.run();
         }
-        for (FutureTask f : fs) {
+        for (FutureTask<?> f : fs) {
           try {
             f.get();
           } catch (Exception e) {

@@ -87,7 +87,7 @@ public class Matrix {
 
   @Override
   public String toString() {
-    String ret = new String();
+    String ret = "\n";
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
         ret += array[i][j] + " ";
@@ -97,7 +97,7 @@ public class Matrix {
     return ret;
   }
 
-  public synchronized void incrementFromMatrix(Matrix m1, Matrix m2) {
+  public void incrementFromMatrix(Matrix m1, Matrix m2) {
     assert row == m1.row && row == m2.row && col == m1.col && col == m2.col;
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {

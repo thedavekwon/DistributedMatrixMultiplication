@@ -3,15 +3,20 @@ package edu.cooper.ece465.threads;
 import edu.cooper.ece465.commons.AtomicMatrix;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
 import lombok.AllArgsConstructor;
+import java.util.Date;
+import org.apache.log4j.Logger;
 
 public class NaiveAtomicParallelMultiplication {
-  private static final int MINIMUM_THRESHOLD = 64;
+  private static final Logger LOG = Logger.getLogger(NaiveAtomicParallelMultiplication.class);
 
-  public static void multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C)
+  public static long multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C)
       throws InterruptedException {
+    Date start = new Date();
     Thread t = new Thread(new NaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     t.start();
     t.join();
+    Date end = new Date();
+    return end.getTime() - start.getTime();
   }
 
   @AllArgsConstructor
@@ -22,7 +27,7 @@ public class NaiveAtomicParallelMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= MINIMUM_THRESHOLD) {
+      if (size <= A.getRow() / 4) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {
