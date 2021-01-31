@@ -13,7 +13,6 @@ public class Matrix {
     row = array_.length;
     col = array_[0].length;
     for (int i = 1; i < row; i++) {
-      // TODO
       assert array[i].length == col;
     }
   }
@@ -61,16 +60,6 @@ public class Matrix {
     }
   }
 
-  public Matrix add(Matrix m) {
-    Matrix ret = new Matrix(row, col);
-    for (int i = 0; i < row; i++) {
-      for (int j = 0; j < col; j++) {
-        ret.setValue(i, j, array[i][j] + m.getValue(i, j));
-      }
-    }
-    return ret;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (o == this) return true;
@@ -97,7 +86,7 @@ public class Matrix {
     return ret;
   }
 
-  public void incrementFromMatrix(Matrix m1, Matrix m2) {
+  public void incrementFromMatrices(Matrix m1, Matrix m2) {
     assert row == m1.row && row == m2.row && col == m1.col && col == m2.col;
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {

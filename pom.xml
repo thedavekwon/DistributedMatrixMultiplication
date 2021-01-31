@@ -37,12 +37,12 @@
     <lombok.version>1.18.16</lombok.version>
   </properties>
 
-  <!-- <scm>
-    <url>git@github.com:robmarano/ece465_at_cooper.git</url>
-    <connection>git@github.com:robmarano/ece465_at_cooper.git</connection>
-    <developerConnection>scm:git:git@github.com:robmarano/ece465_at_cooper.git</developerConnection>
+  <scm>
+    <url>git@github.com:thedavekwon/DistributedMatrixMultiplication.git</url>
+    <connection>git@github.com:thedavekwon/DistributedMatrixMultiplication.git</connection>
+    <developerConnection>scm:git:git@github.com:thedavekwon/DistributedMatrixMultiplication.git</developerConnection>
     <tag>HEAD</tag>
-  </scm> -->
+  </scm>
 
   <!-- <distributionManagement>
     <repository>

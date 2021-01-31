@@ -33,7 +33,7 @@ fi
 #
 APP_VERSION=$(cat ${APP_VERSION_FILE})
 
-#mvn test
+mvn test
 mvn install -Dmaven.test.skip=true
 mvn package -N -P classpath-deps -Dmaven.test.skip=true
 

@@ -121,7 +121,7 @@ public class ThreadPooledParallelMultiplication {
         } catch (Exception e) {
 
         }
-        C.incrementFromMatrix(C1, C2);
+        C.incrementFromMatrices(C1, C2);
         // LOG.info(C1.toString());
         // LOG.info(C2.toString());
         // LOG.info(C.toString());

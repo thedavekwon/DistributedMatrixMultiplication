@@ -108,7 +108,7 @@ public class ParallelMultiplication {
             e.printStackTrace();
           }
         }
-        C.incrementFromMatrix(C1, C2);
+        C.incrementFromMatrices(C1, C2);
       }
     }
   }
