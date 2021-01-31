@@ -8,10 +8,11 @@ public class SerialMatrixMultiplication {
       Logger.getLogger(SerialMatrixMultiplication.class);
   public static long multiply(Matrix A, Matrix B, Matrix C) {
     Date start = new Date();
-    LOG.info("SerialMatrixMultiplication.multiply() - start");
+    LOG.debug("SerialMatrixMultiplication.multiply() - start");
     multiplyWithIndex(A, B, C, 0, 0, 0, 0, 0, 0, A.getRow(), B.getCol(), A.getCol());
-    LOG.info("SerialMatrixMultiplication.multiply() - end");
+    LOG.debug("SerialMatrixMultiplication.multiply() - end");
     Date end = new Date();
+    LOG.info("SerialMatrixMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
     return end.getTime() - start.getTime();
   }
 

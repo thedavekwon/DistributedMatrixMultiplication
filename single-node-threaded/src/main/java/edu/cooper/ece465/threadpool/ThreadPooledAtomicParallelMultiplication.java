@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
 public class ThreadPooledAtomicParallelMultiplication {
   private static final Logger LOG =
       Logger.getLogger(ThreadPooledAtomicParallelMultiplication.class);
-  private static ExecutorService exec =
-      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+  private static ExecutorService exec;
 
   public static long multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C) {
+    exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     Date start = new Date();
-    LOG.info("ThreadPooledAtomicParallelMultiplication.multiply() - start");
+    LOG.debug("ThreadPooledAtomicParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledAtomicParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -26,8 +26,10 @@ public class ThreadPooledAtomicParallelMultiplication {
     } catch (Exception e) {
       LOG.debug(e);
     }
-    LOG.info("ThreadPooledAtomicParallelMultiplication.multiply() - end");
+    LOG.debug("ThreadPooledAtomicParallelMultiplication.multiply() - end");
     Date end = new Date();
+    LOG.info("ThreadPooledAtomicParallelMultiplication Time taken in milli seconds: "
+        + (end.getTime() - start.getTime()));
     return end.getTime() - start.getTime();
   }
 
@@ -39,66 +41,27 @@ public class ThreadPooledAtomicParallelMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 2) {
-        SerialMatrixMultiplication.multiplyWithIndex(
-            A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
+      if (size <= A.getRow() / 4) {
+        SerialMatrixMultiplication.multiplyWithIndex(A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size,
+            size, size);
       } else {
         int newSize = size / 2;
-        ThreadPooledAtomicParallelMultiply[] tasks =
-            new ThreadPooledAtomicParallelMultiply[] {
-              new ThreadPooledAtomicParallelMultiply(
-                  A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A, B, C, A_i, A_j + newSize, B_i + newSize, B_j, C_i, C_j, newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A, B, C, A_i, A_j + newSize, B_i, B_j + newSize, C_i, C_j + newSize, newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A,
-                  B,
-                  C,
-                  A_i,
-                  A_j + newSize,
-                  B_i + newSize,
-                  B_j + newSize,
-                  C_i,
-                  C_j + newSize,
-                  newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A, B, C, A_i + newSize, A_j, B_i, B_j, C_i + newSize, C_j, newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A,
-                  B,
-                  C,
-                  A_i + newSize,
-                  A_j + newSize,
-                  B_i + newSize,
-                  B_j,
-                  C_i + newSize,
-                  C_j,
-                  newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A,
-                  B,
-                  C,
-                  A_i + newSize,
-                  A_j,
-                  B_i,
-                  B_j + newSize,
-                  C_i + newSize,
-                  C_j + newSize,
-                  newSize),
-              new ThreadPooledAtomicParallelMultiply(
-                  A,
-                  B,
-                  C,
-                  A_i + newSize,
-                  A_j + newSize,
-                  B_i + newSize,
-                  B_j + newSize,
-                  C_i + newSize,
-                  C_j + newSize,
-                  newSize)
-            };
+        ThreadPooledAtomicParallelMultiply[] tasks = new ThreadPooledAtomicParallelMultiply[] {
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i, A_j + newSize, B_i + newSize, B_j,
+                C_i, C_j, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i, A_j + newSize, B_i, B_j + newSize,
+                C_i, C_j + newSize, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i, A_j + newSize, B_i + newSize,
+                B_j + newSize, C_i, C_j + newSize, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i + newSize, A_j, B_i, B_j,
+                C_i + newSize, C_j, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i + newSize, A_j + newSize,
+                B_i + newSize, B_j, C_i + newSize, C_j, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i + newSize, A_j, B_i, B_j + newSize,
+                C_i + newSize, C_j + newSize, newSize),
+            new ThreadPooledAtomicParallelMultiply(A, B, C, A_i + newSize, A_j + newSize,
+                B_i + newSize, B_j + newSize, C_i + newSize, C_j + newSize, newSize)};
         Future<?>[] fs = new Future[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
           fs[i] = exec.submit(tasks[i]);
@@ -108,7 +71,7 @@ public class ThreadPooledAtomicParallelMultiplication {
             f.get();
           }
         } catch (Exception e) {
-            LOG.error(e);
+          LOG.error(e);
         }
       }
     }

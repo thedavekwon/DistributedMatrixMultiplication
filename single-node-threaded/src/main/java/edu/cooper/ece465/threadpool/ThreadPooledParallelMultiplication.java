@@ -11,12 +11,12 @@ import org.apache.log4j.Logger;
 
 public class ThreadPooledParallelMultiplication {
   private static final Logger LOG = Logger.getLogger(ThreadPooledParallelMultiplication.class);
-  private static ExecutorService exec =
-      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+  private static ExecutorService exec;
 
   public static long multiply(Matrix A, Matrix B, Matrix C) {
+    exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     Date start = new Date();
-    LOG.info("ThreadPooledParallelMultiplication.multiply() - start");
+    LOG.debug("ThreadPooledParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -25,8 +25,9 @@ public class ThreadPooledParallelMultiplication {
     } catch (Exception e) {
       LOG.error(e);
     }
-    LOG.info("ThreadPooledParallelMultiplication.multiply() - end");
+    LOG.debug("ThreadPooledParallelMultiplication.multiply() - end");
     Date end = new Date();
+    LOG.info("ThreadPooledParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
     return end.getTime() - start.getTime();
   }
 
@@ -109,7 +110,7 @@ public class ThreadPooledParallelMultiplication {
         //   try {
         //     f.get();
         //   } catch (Exception e) {
-        //     // LOG.info(e);
+        //     // LOG.debug(e);
         //   }
         // }
         Future<?>[] fs = new Future[tasks.length];
@@ -124,9 +125,9 @@ public class ThreadPooledParallelMultiplication {
             LOG.error(e);
         }
         C.incrementFromMatrices(C1, C2);
-        // LOG.info(C1.toString());
-        // LOG.info(C2.toString());
-        // LOG.info(C.toString());
+        // LOG.debug(C1.toString());
+        // LOG.debug(C2.toString());
+        // LOG.debug(C.toString());
       }
     }
   }

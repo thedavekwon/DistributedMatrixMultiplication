@@ -11,11 +11,12 @@ public class ParallelMultiplication {
   public static long multiply(Matrix A, Matrix B, Matrix C) throws InterruptedException {
     Date start = new Date();
     Thread t = new Thread(new ParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
-    LOG.info("ParallelMultiplication.multiply() - start");
+    LOG.debug("ParallelMultiplication.multiply() - start");
     t.start();
     t.join();
-    LOG.info("ParallelMultiplication.multiply() - end");
+    LOG.debug("ParallelMultiplication.multiply() - end");
     Date end = new Date();
+    LOG.info("ParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
     return end.getTime() - start.getTime();
   }
 

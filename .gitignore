@@ -25,3 +25,5 @@ app.version
 hs_err_pid*
 
 *.settings/
+
+logs/
