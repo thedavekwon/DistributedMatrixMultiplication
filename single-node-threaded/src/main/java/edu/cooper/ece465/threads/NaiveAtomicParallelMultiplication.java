@@ -12,9 +12,11 @@ public class NaiveAtomicParallelMultiplication {
   public static long multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C)
       throws InterruptedException {
     Date start = new Date();
+    LOG.info("NaiveAtomicParallelMultiplication.multiply() - start");
     Thread t = new Thread(new NaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     t.start();
     t.join();
+    LOG.info("NaiveAtomicParallelMultiplication.multiply() - end");
     Date end = new Date();
     return end.getTime() - start.getTime();
   }
@@ -110,6 +112,7 @@ public class NaiveAtomicParallelMultiplication {
             thread.join();
           } catch (InterruptedException e) {
             // TODO Auto-generated catch block
+            LOG.debug(e);
             e.printStackTrace();
           }
         }

@@ -17,14 +17,16 @@ public class ThreadPooledAtomicParallelMultiplication {
 
   public static long multiply(AtomicMatrix A, AtomicMatrix B, AtomicMatrix C) {
     Date start = new Date();
+    LOG.info("ThreadPooledAtomicParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledAtomicParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
       f.get();
       exec.shutdown();
     } catch (Exception e) {
-      LOG.info(e);
+      LOG.debug(e);
     }
+    LOG.info("ThreadPooledAtomicParallelMultiplication.multiply() - end");
     Date end = new Date();
     return end.getTime() - start.getTime();
   }
@@ -37,7 +39,7 @@ public class ThreadPooledAtomicParallelMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 4) {
+      if (size <= A.getRow() / 2) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {
@@ -106,7 +108,7 @@ public class ThreadPooledAtomicParallelMultiplication {
             f.get();
           }
         } catch (Exception e) {
-
+            LOG.error(e);
         }
       }
     }

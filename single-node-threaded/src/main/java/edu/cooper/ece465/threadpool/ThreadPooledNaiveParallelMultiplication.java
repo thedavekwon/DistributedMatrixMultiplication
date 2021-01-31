@@ -17,14 +17,16 @@ public class ThreadPooledNaiveParallelMultiplication {
 
   public static long multiply(Matrix A, Matrix B, Matrix C) {
     Date start = new Date();
+    LOG.info("ThreadPooledNaiveParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
       f.get();
       exec.shutdown();
     } catch (Exception e) {
-      LOG.info(e);
+      LOG.debug(e);
     }
+    LOG.info("ThreadPooledNaiveParallelMultiplication.multiply() - end");
     Date end = new Date();
     return end.getTime() - start.getTime();
   }
@@ -108,6 +110,7 @@ public class ThreadPooledNaiveParallelMultiplication {
           try {
             f.get();
           } catch (Exception e) {
+              LOG.error(e);
           }
         }
       }
