@@ -4,13 +4,17 @@ import edu.cooper.ece465.commons.Matrix;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
 import java.util.Date;
 import lombok.AllArgsConstructor;
+import org.apache.log4j.Logger;
 
 public class NaiveParallelMultiplication {
+  private static final Logger LOG = Logger.getLogger(NaiveParallelMultiplication.class);
   public static long multiply(Matrix A, Matrix B, Matrix C) throws InterruptedException {
     Date start = new Date();
+    LOG.info("NaiveParallelMultiplication.multiply() - start");
     Thread t = new Thread(new NaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     t.start();
     t.join();
+    LOG.info("NaiveParallelMultiplication.multiply() - end");
     Date end = new Date();
     return end.getTime() - start.getTime();
   }
@@ -105,6 +109,7 @@ public class NaiveParallelMultiplication {
           try {
             thread.join();
           } catch (InterruptedException e) {
+            LOG.debug(e);
             e.printStackTrace();
           }
         }

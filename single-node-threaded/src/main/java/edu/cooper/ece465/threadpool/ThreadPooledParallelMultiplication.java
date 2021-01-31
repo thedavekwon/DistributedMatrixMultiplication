@@ -16,6 +16,7 @@ public class ThreadPooledParallelMultiplication {
 
   public static long multiply(Matrix A, Matrix B, Matrix C) {
     Date start = new Date();
+    LOG.info("ThreadPooledParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -24,6 +25,7 @@ public class ThreadPooledParallelMultiplication {
     } catch (Exception e) {
       LOG.error(e);
     }
+    LOG.info("ThreadPooledParallelMultiplication.multiply() - end");
     Date end = new Date();
     return end.getTime() - start.getTime();
   }
@@ -36,7 +38,7 @@ public class ThreadPooledParallelMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 4) {
+      if (size <= A.getRow() / 2) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {
@@ -119,7 +121,7 @@ public class ThreadPooledParallelMultiplication {
             f.get();
           }
         } catch (Exception e) {
-
+            LOG.error(e);
         }
         C.incrementFromMatrices(C1, C2);
         // LOG.info(C1.toString());
