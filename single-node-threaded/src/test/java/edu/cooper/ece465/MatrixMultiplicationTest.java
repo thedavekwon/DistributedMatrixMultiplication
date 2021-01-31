@@ -51,11 +51,11 @@ public class MatrixMultiplicationTest {
     assertTrue("ThreadPooledNaiveParallelMultiplication", A.equals(C));
   }
 
-  @Test
-  public void ThreadPooledParallelMultiplicationTest() {
-    ThreadPooledParallelMultiplication.multiply(A, B, C);
-    assertTrue("ThreadPooledParallelMultiplication", A.equals(C));
-  }
+  // @Test
+  // public void ThreadPooledParallelMultiplicationTest() {
+  //   ThreadPooledParallelMultiplication.multiply(A, B, C);
+  //   assertTrue("ThreadPooledParallelMultiplication", A.equals(C));
+  // }
 
   @Test
   public void NaiveAtomicParallelMultiplicationTest() throws InterruptedException {
@@ -63,9 +63,9 @@ public class MatrixMultiplicationTest {
     assertTrue("NaiveAtomicParallelMultiplication", AA.equals(AC));
   }
 
-  @Test
-  public void ThreadPooledAtomicParallelMultiplicationTest() {
-    ThreadPooledAtomicParallelMultiplication.multiply(AA, AB, AC);
-    assertTrue("ThreadPooledAtomicParallelMultiplication", AA.equals(AC));
-  }
+  // @Test
+  // public void ThreadPooledAtomicParallelMultiplicationTest() {
+  //   ThreadPooledAtomicParallelMultiplication.multiply(AA, AB, AC);
+  //   assertTrue("ThreadPooledAtomicParallelMultiplication", AA.equals(AC));
+  // }
 }

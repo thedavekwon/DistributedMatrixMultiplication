@@ -12,12 +12,12 @@ import org.apache.log4j.Logger;
 
 public class ThreadPooledNaiveParallelMultiplication {
   private static final Logger LOG = Logger.getLogger(ThreadPooledNaiveParallelMultiplication.class);
-  private static ExecutorService exec =
-      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+  private static ExecutorService exec;
 
   public static long multiply(Matrix A, Matrix B, Matrix C) {
+    exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     Date start = new Date();
-    LOG.info("ThreadPooledNaiveParallelMultiplication.multiply() - start");
+    LOG.debug("ThreadPooledNaiveParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -26,8 +26,9 @@ public class ThreadPooledNaiveParallelMultiplication {
     } catch (Exception e) {
       LOG.debug(e);
     }
-    LOG.info("ThreadPooledNaiveParallelMultiplication.multiply() - end");
+    LOG.debug("ThreadPooledNaiveParallelMultiplication.multiply() - end");
     Date end = new Date();
+    LOG.info("ThreadPooledNaiveParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
     return end.getTime() - start.getTime();
   }
 

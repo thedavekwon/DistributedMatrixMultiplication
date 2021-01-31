@@ -10,12 +10,13 @@ public class NaiveParallelMultiplication {
   private static final Logger LOG = Logger.getLogger(NaiveParallelMultiplication.class);
   public static long multiply(Matrix A, Matrix B, Matrix C) throws InterruptedException {
     Date start = new Date();
-    LOG.info("NaiveParallelMultiplication.multiply() - start");
+    LOG.debug("NaiveParallelMultiplication.multiply() - start");
     Thread t = new Thread(new NaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     t.start();
     t.join();
-    LOG.info("NaiveParallelMultiplication.multiply() - end");
+    LOG.debug("NaiveParallelMultiplication.multiply() - end");
     Date end = new Date();
+    LOG.info("NaiveParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
     return end.getTime() - start.getTime();
   }
 
