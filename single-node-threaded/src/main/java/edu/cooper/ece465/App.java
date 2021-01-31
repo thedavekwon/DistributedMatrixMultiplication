@@ -11,8 +11,10 @@ import edu.cooper.ece465.threads.ParallelMultiplication;
 
 public class App {
   public static void main(String[] args) throws InterruptedException {
-    int N = 1024;
+    
+  }
 
+  public long[] test(int N) throws InterruptedException {
     Matrix A = Matrix.createRandomMatrix(N, N);
     Matrix B = Matrix.createRandomMatrix(N, N);
     Matrix C = new Matrix(N, N);
@@ -42,5 +44,7 @@ public class App {
     AtomicC.clear();
     long t6 = ThreadPooledAtomicParallelMultiplication.multiply(AtomicA, AtomicB, AtomicC);
     System.out.println("Time taken in milli seconds: " + t6);
+
+    return new long[] {t1, t2, t3, t4, t5, t6};
   }
 }
