@@ -6,7 +6,7 @@ This project is splitted up into three different parts. The first single-node-th
 ## Algorithm Description
 Naive matrix multiplication involves iterating over all of the elements of matrix A and matrix B row by row to calulate specific elements in the resultant matrix C in a certain order. Each element is calculated using the following formula:
 
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;c_{i, j}=\sum_{k=1}^{m}a_{i,k}b_{k,j}" />
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;c_{i,%20j}=\sum_{k=1}^{m}a_{i,k}b_{k,j}" />
 
 Given matrix A with [n x m] dimensions nad matrix B with [m x p]  dimensions, the naive algorithm will take Θ(n*m*p) time. For simpler cases with square matrices, the algorithm will take Θ(n^3) time. 
 
