@@ -1,5 +1,6 @@
 # Single Node Threaded Matrix Multiplication
-Assume matrix A and B are n by b and the resultant matrix C is n by n.
+Assume matrix A and B are n by b and the resultant matrix C is N by N.
+<img src="output.png">
 
 ### Serial Matrix Multiplication
 This method is the basic method of computing a matrix, involving going through each corresponding row of A and column of B and serially summing all the multiplications. 

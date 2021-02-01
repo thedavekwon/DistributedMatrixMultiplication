@@ -10,8 +10,8 @@ import edu.cooper.ece465.threads.ParallelMultiplication;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MatrixMultiplicationTest {
-  private int N = 32;
+public class MatrixMultiplicationComplexTest {
+  private int N = 1024;
   private Matrix A;
   private Matrix B;
   private Matrix C;
