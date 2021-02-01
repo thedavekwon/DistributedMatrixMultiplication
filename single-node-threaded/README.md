@@ -3,3 +3,5 @@
 ### Serial Matrix Multiplication
 
 ### Parallel Matrix Multiplication
+
+<img src="output.png">
