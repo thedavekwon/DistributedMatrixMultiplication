@@ -2,6 +2,7 @@
 ## Description
 This project is splitted up into three different parts. The first single-node-threaded contains a single node multi threaded computation of matrix multiplication.
 
+![Java CI with Maven](https://github.com/thedavekwon/DistributedMatrixMultiplication/workflows/Java%20CI%20with%20Maven/badge.svg)
 
 ## Algorithm Description
 Naive matrix multiplication involves iterating over all of the elements of matrix A and matrix B row by row to calulate specific elements in the resultant matrix C in a certain order. Each element is calculated using the following formula:
