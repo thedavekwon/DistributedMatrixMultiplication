@@ -1,39 +1,35 @@
 package edu.cooper.ece465.threadpool;
 
 import edu.cooper.ece465.commons.Matrix;
+import edu.cooper.ece465.commons.MatrixMultiplication;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import lombok.AllArgsConstructor;
-import org.apache.log4j.Logger;
 
-public class ThreadPooledNaiveParallelMultiplication {
-  private static final Logger LOG = Logger.getLogger(ThreadPooledNaiveParallelMultiplication.class);
-  private static ExecutorService exec;
-
-  public static long multiply(Matrix A, Matrix B, Matrix C) {
+public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplication {
+  private ExecutorService exec;
+  
+  public ThreadPooledNaiveParallelMultiplication() {
+    super(ThreadPooledNaiveParallelMultiplication.class.toString());
+  }
+  
+  public void multiply(Matrix A, Matrix B, Matrix C) {
     exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    Date start = new Date();
-    LOG.debug("ThreadPooledNaiveParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
       f.get();
       exec.shutdown();
     } catch (Exception e) {
-      LOG.debug(e);
+      LOG.error(e);
     }
-    LOG.debug("ThreadPooledNaiveParallelMultiplication.multiply() - end");
-    Date end = new Date();
-    LOG.info("ThreadPooledNaiveParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
-    return end.getTime() - start.getTime();
   }
 
   @AllArgsConstructor
-  private static class ThreadPooledNaiveParallelMultiply implements Runnable {
+  private class ThreadPooledNaiveParallelMultiply implements Runnable {
     private Matrix A;
     private Matrix B;
     private Matrix C;
@@ -111,7 +107,7 @@ public class ThreadPooledNaiveParallelMultiplication {
           try {
             f.get();
           } catch (Exception e) {
-              LOG.error(e);
+            LOG.error(e);
           }
         }
       }
@@ -119,7 +115,7 @@ public class ThreadPooledNaiveParallelMultiplication {
   }
 
   @AllArgsConstructor
-  private static class SequentialRunner implements Runnable {
+  private class SequentialRunner implements Runnable {
     private ThreadPooledNaiveParallelMultiply first, second;
 
     public void run() {

@@ -1,22 +1,22 @@
 package edu.cooper.ece465.threadpool;
 
 import edu.cooper.ece465.commons.Matrix;
+import edu.cooper.ece465.commons.MatrixMultiplication;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import lombok.AllArgsConstructor;
-import org.apache.log4j.Logger;
 
-public class ThreadPooledParallelMultiplication {
-  private static final Logger LOG = Logger.getLogger(ThreadPooledParallelMultiplication.class);
-  private static ExecutorService exec;
-
-  public static long multiply(Matrix A, Matrix B, Matrix C) {
+public class ThreadPooledParallelMultiplication extends MatrixMultiplication {
+  private ExecutorService exec;
+  
+  public ThreadPooledParallelMultiplication() {
+    super(ThreadPooledParallelMultiplication.class.toString());
+  }
+  
+  public void multiply(Matrix A, Matrix B, Matrix C) {
     exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    Date start = new Date();
-    LOG.debug("ThreadPooledParallelMultiplication.multiply() - start");
     Future<?> f =
         exec.submit(new ThreadPooledParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -25,14 +25,10 @@ public class ThreadPooledParallelMultiplication {
     } catch (Exception e) {
       LOG.error(e);
     }
-    LOG.debug("ThreadPooledParallelMultiplication.multiply() - end");
-    Date end = new Date();
-    LOG.info("ThreadPooledParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
-    return end.getTime() - start.getTime();
   }
 
   @AllArgsConstructor
-  private static class ThreadPooledParallelMultiply implements Runnable {
+  private class ThreadPooledParallelMultiply implements Runnable {
     private Matrix A;
     private Matrix B;
     private Matrix C;
@@ -100,19 +96,6 @@ public class ThreadPooledParallelMultiplication {
                   C_j + newSize,
                   newSize)
             };
-        // FutureTask<?>[] fs = new FutureTask[tasks.length];
-        // for (int i = 0; i < tasks.length; i++) {
-        //   fs[i] = new FutureTask<Void>(fs[i], null);
-        //   exec.execute(fs[i]);
-        // }
-        // for (FutureTask<?> f : fs) f.run();
-        // for (FutureTask<?> f : fs) {
-        //   try {
-        //     f.get();
-        //   } catch (Exception e) {
-        //     // LOG.debug(e);
-        //   }
-        // }
         Future<?>[] fs = new Future[tasks.length];
         for (int i = 0; i < tasks.length; i++) {
           fs[i] = exec.submit(tasks[i]);
@@ -122,7 +105,7 @@ public class ThreadPooledParallelMultiplication {
             f.get();
           }
         } catch (Exception e) {
-            LOG.error(e);
+          LOG.error(e);
         }
         C.incrementFromMatrices(C1, C2);
         // LOG.debug(C1.toString());

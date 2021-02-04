@@ -1,27 +1,28 @@
 package edu.cooper.ece465.threads;
 
-import java.util.Date;
 import edu.cooper.ece465.commons.Matrix;
+import edu.cooper.ece465.commons.MatrixMultiplication;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
 import lombok.AllArgsConstructor;
-import org.apache.log4j.Logger;
 
-public class ParallelMultiplication {
-  private static final Logger LOG = Logger.getLogger(ParallelMultiplication.class);
-  public static long multiply(Matrix A, Matrix B, Matrix C) throws InterruptedException {
-    Date start = new Date();
+public class ParallelMultiplication extends MatrixMultiplication {
+  public ParallelMultiplication() {
+    super(ParallelMultiplication.class.toString());
+  }
+
+  public void multiply(Matrix A, Matrix B, Matrix C) {
     Thread t = new Thread(new ParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
-    LOG.debug("ParallelMultiplication.multiply() - start");
     t.start();
-    t.join();
-    LOG.debug("ParallelMultiplication.multiply() - end");
-    Date end = new Date();
-    LOG.info("ParallelMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
-    return end.getTime() - start.getTime();
+    try {
+      t.join();
+    } catch (InterruptedException e) {
+      LOG.error(e);
+      e.printStackTrace();
+    }
   }
 
   @AllArgsConstructor
-  private static class ParallelMultiply implements Runnable {
+  private class ParallelMultiply implements Runnable {
     private Matrix A;
     private Matrix B;
     private Matrix C;
@@ -110,7 +111,7 @@ public class ParallelMultiplication {
           try {
             thread.join();
           } catch (InterruptedException e) {
-            LOG.debug(e);
+            LOG.error(e);
             e.printStackTrace();
           }
         }
