@@ -10,7 +10,7 @@ import java.util.concurrent.FutureTask;
 import lombok.AllArgsConstructor;
 
 public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplication {
-  private ExecutorService exec;
+  private ExecutorService exec = Executors.newWorkStealingPool();
 
   public ThreadPooledNaiveParallelMultiplication() {
     super(ThreadPooledNaiveParallelMultiplication.class.toString());
@@ -18,7 +18,6 @@ public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplicatio
 
   public void multiply(Matrix A, Matrix B, Matrix C) {
     // exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    exec = Executors.newWorkStealingPool();
     Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -37,7 +36,7 @@ public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplicatio
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 8) {
+      if (size <= A.getRow() / 4) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {

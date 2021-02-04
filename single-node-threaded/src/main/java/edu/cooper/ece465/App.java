@@ -6,6 +6,7 @@ import edu.cooper.ece465.threadpool.ThreadPooledNaiveParallelMultiplication;
 import edu.cooper.ece465.threadpool.ThreadPooledParallelMultiplication;
 import edu.cooper.ece465.threads.ParallelMultiplication;
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 
@@ -14,14 +15,13 @@ public class App {
   private static final Logger LOG = Logger.getLogger(App.class);
 
   public static void main(String[] args) throws InterruptedException, IOException {
-    // writer = new BufferedWriter(new FileWriter("output.csv"));
-    // writer.write("N, Serial, Parallel, ThreadPooledNaiveParallel, ThreadPooledParallel\n");
-    // for (int i = 1; i < 130; i += 10) {
-    //   LOG.info("N = " + 16 * i);
-    //   test(16 * i);
-    // }
-    // writer.close();
-    test(2048);
+    writer = new BufferedWriter(new FileWriter("output.csv"));
+    writer.write("N, Serial, Parallel, ThreadPooledNaiveParallel, ThreadPooledParallel\n");
+    for (int i = 1; i < 130; i += 10) {
+      LOG.info("N = " + 16 * i);
+      test(16 * i);
+    }
+    writer.close();
   }
 
   public static long[] test(int N) throws InterruptedException, IOException {
