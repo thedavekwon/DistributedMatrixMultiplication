@@ -10,14 +10,14 @@ import java.util.concurrent.FutureTask;
 import lombok.AllArgsConstructor;
 
 public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplication {
-  private ExecutorService exec;
-  
+  private ExecutorService exec = Executors.newWorkStealingPool();
+
   public ThreadPooledNaiveParallelMultiplication() {
     super(ThreadPooledNaiveParallelMultiplication.class.toString());
   }
-  
+
   public void multiply(Matrix A, Matrix B, Matrix C) {
-    exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    // exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {

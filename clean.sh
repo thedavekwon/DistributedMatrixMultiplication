@@ -4,6 +4,10 @@ APP_VERSION_FILE=./app.version
 
 echo "Removing built project artifacts..."
 /bin/rm -rf ./build
+
+echo "Removing previous outputs"
+/bin/rm output.csv
+
 echo "Done."
 echo "Maven build clean..."
 mvn clean
