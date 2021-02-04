@@ -1,19 +1,12 @@
 package edu.cooper.ece465.commons;
 
-import java.util.Date;
-import org.apache.log4j.Logger;
+public class SerialMatrixMultiplication extends MatrixMultiplication {
+  public SerialMatrixMultiplication() {
+    super(SerialMatrixMultiplication.class.toString());
+  }
 
-public class SerialMatrixMultiplication {
-  private static final Logger LOG =
-      Logger.getLogger(SerialMatrixMultiplication.class);
-  public static long multiply(Matrix A, Matrix B, Matrix C) {
-    Date start = new Date();
-    LOG.debug("SerialMatrixMultiplication.multiply() - start");
+  public void multiply(Matrix A, Matrix B, Matrix C) {
     multiplyWithIndex(A, B, C, 0, 0, 0, 0, 0, 0, A.getRow(), B.getCol(), A.getCol());
-    LOG.debug("SerialMatrixMultiplication.multiply() - end");
-    Date end = new Date();
-    LOG.info("SerialMatrixMultiplication Time taken in milli seconds: " + (end.getTime() - start.getTime()));
-    return end.getTime() - start.getTime();
   }
 
   public static void multiplyWithIndex(
