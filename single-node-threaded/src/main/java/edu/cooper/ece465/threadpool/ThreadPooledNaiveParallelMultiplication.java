@@ -11,13 +11,14 @@ import lombok.AllArgsConstructor;
 
 public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplication {
   private ExecutorService exec;
-  
+
   public ThreadPooledNaiveParallelMultiplication() {
     super(ThreadPooledNaiveParallelMultiplication.class.toString());
   }
-  
+
   public void multiply(Matrix A, Matrix B, Matrix C) {
-    exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    // exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    exec = Executors.newWorkStealingPool();
     Future<?> f =
         exec.submit(new ThreadPooledNaiveParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -36,7 +37,7 @@ public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplicatio
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 4) {
+      if (size <= A.getRow() / 8) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {

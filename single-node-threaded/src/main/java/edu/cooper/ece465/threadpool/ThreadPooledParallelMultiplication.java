@@ -10,13 +10,14 @@ import lombok.AllArgsConstructor;
 
 public class ThreadPooledParallelMultiplication extends MatrixMultiplication {
   private ExecutorService exec;
-  
+
   public ThreadPooledParallelMultiplication() {
     super(ThreadPooledParallelMultiplication.class.toString());
   }
-  
+
   public void multiply(Matrix A, Matrix B, Matrix C) {
-    exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    // exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    exec = Executors.newWorkStealingPool();
     Future<?> f =
         exec.submit(new ThreadPooledParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
     try {
@@ -35,7 +36,7 @@ public class ThreadPooledParallelMultiplication extends MatrixMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 2) {
+      if (size <= A.getRow() / 8) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {
@@ -108,9 +109,6 @@ public class ThreadPooledParallelMultiplication extends MatrixMultiplication {
           LOG.error(e);
         }
         C.incrementFromMatrices(C1, C2);
-        // LOG.debug(C1.toString());
-        // LOG.debug(C2.toString());
-        // LOG.debug(C.toString());
       }
     }
   }
