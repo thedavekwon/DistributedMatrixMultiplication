@@ -21,6 +21,7 @@ public class MatrixTest {
     assertTrue("equals", A.equals(B));
   }
 
+
   @Test
   public void I() {
     int[][] array =
@@ -67,4 +68,38 @@ public class MatrixTest {
                   {3, 3, 3, 3},
                 })));
   }
+
+  @Test
+  public void incrementFromMatricesII() {
+    int[][] arrayA =
+        new int[][] {
+          {1, 1, 1, 1, 1},
+          {1, 1, 1, 1, 1},
+          {1, 1, 1, 1, 1},
+          {1, 1, 1, 1, 1},
+        };
+    int[][] arrayB =
+        new int[][] {
+          {2, 2, 2, 2, 2},
+          {2, 2, 2, 2, 2},
+          {2, 2, 2, 2, 2},
+          {2, 2, 2, 2, 2},
+        };
+    Matrix A = new Matrix(arrayA);
+    Matrix B = new Matrix(arrayB);
+    Matrix C = new Matrix(4, 5);
+    C.incrementFromMatrices(A, B);
+
+    assertTrue(
+        "incrementFromMatricesII",
+        C.equals(
+            new Matrix(
+                new int[][] {
+                  {3, 3, 3, 3, 3},
+                  {3, 3, 3, 3, 3},
+                  {3, 3, 3, 3, 3},
+                  {3, 3, 3, 3, 3},
+                })));
+  }
+
 }

@@ -6,12 +6,13 @@ import edu.cooper.ece465.commons.Matrix;
 import edu.cooper.ece465.commons.SerialMatrixMultiplication;
 import edu.cooper.ece465.threadpool.ThreadPooledNaiveParallelMultiplication;
 import edu.cooper.ece465.threadpool.ThreadPooledParallelMultiplication;
+import edu.cooper.ece465.threads.NonsquareParallelMultiplication;
 import edu.cooper.ece465.threads.ParallelMultiplication;
 import org.junit.Before;
 import org.junit.Test;
 
 public class MatrixMultiplicationComplexTest {
-  private int N = 1024;
+  private int N = 512;
   private Matrix A;
   private Matrix B;
   private Matrix C;
@@ -45,5 +46,11 @@ public class MatrixMultiplicationComplexTest {
   public void ThreadPooledParallelMultiplicationTest() {
     new ThreadPooledParallelMultiplication().multiply(A, B, C);
     assertTrue("ThreadPooledParallelMultiplication", A.equals(C));
+  }
+
+  @Test
+  public void NonsqaureParallelMultiplicationTest() {
+    new NonsquareParallelMultiplication().multiply(A, B, C);
+    assertTrue("NonsqaureParallelMultiplication", A.equals(C));
   }
 }
