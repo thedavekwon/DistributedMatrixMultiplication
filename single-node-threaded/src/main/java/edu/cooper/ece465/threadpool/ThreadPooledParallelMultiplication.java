@@ -46,7 +46,7 @@ public class ThreadPooledParallelMultiplication extends MatrixMultiplication {
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 4) {
+      if (size <= A.getRow() / split) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {

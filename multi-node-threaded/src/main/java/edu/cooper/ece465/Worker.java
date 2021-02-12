@@ -29,17 +29,15 @@ public class Worker {
       LOG.error("RPC failed " + e);
       return;
     }
+    LOG.info("Recieved response from coordinator");
     Matrix A = Matrix.fromByteString(response.getA());
     Matrix B = Matrix.fromByteString(response.getB());
     
-    LOG.info(response);
     int index = response.getIndex();
     Indexes indexes = response.getIndexes();
     Matrix C = Matrix.like(A);
-    LOG.info(MatrixIndexes.fromIndexes(indexes).toString());
-    new SerialMatrixMultiplication()
+    new ThreadPooledNaiveParallelMultiplication(8)
         .multiplyWithMatrixIndexes(A, B, C, MatrixIndexes.fromIndexes(indexes));
-    LOG.info(C.toString());
     DataMessage resultMessage =
         DataMessage.newBuilder()
             .setType(DataMessageType.SEND_RESULT)
@@ -47,6 +45,7 @@ public class Worker {
             .setIndexes(indexes)
             .setA(C.toByteString())
             .build();
+    LOG.info("Sending response back to coordinator");
     try {
       response = blockingStub.sendResult(resultMessage);
     } catch (StatusRuntimeException e) {

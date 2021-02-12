@@ -129,8 +129,8 @@ public class Matrix implements Serializable {
   }
 
   public void incrementFromMatrixIndexes(Matrix m, MatrixIndexes indexes) {
-    for (int i = indexes.getC_i(); i < indexes.getC_i() + indexes.getSize() / 2; i++) {
-      for (int j = indexes.getC_j(); j < indexes.getC_j() + indexes.getSize() / 2; j++) {
+    for (int i = indexes.getC_i(); i < indexes.getC_i() + indexes.getSize(); i++) {
+      for (int j = indexes.getC_j(); j < indexes.getC_j() + indexes.getSize(); j++) {
         array[i][j] += m.getValue(i, j);
       }
     }

@@ -13,7 +13,7 @@ import org.javatuples.Pair;
 public class Coordinator {
   private static final Logger LOG = Logger.getLogger(Coordinator.class);
 
-  private static int N = 16;
+  private static int N = 512;
   private static Matrix A = Matrix.createRandomMatrix(N, N);
   private static Matrix B = Matrix.I(N, N);
   private static Matrix C = new Matrix(N, N);
@@ -61,7 +61,6 @@ public class Coordinator {
     server.blockUntilShutdown();
 
     C.incrementFromMatrices(C1, C2);
-    LOG.info(C.toString());
     LOG.info(A.equals(C));
   }
 
@@ -70,6 +69,7 @@ public class Coordinator {
     public void requestResource(DataMessage msg, StreamObserver<DataMessage> rObserver) {
       if (!msg.getType().equals(DataMessageType.SEND_REQUEST)) return;
       if (queue.getSize() == 0) return;
+      LOG.info("Recieved resource request");
       Pair<Integer, MatrixIndexes> p = queue.poll();
       DataMessage response;
       try {
@@ -87,12 +87,14 @@ public class Coordinator {
         return;
       }
       rObserver.onNext(response);
+      LOG.info("Send resource to worker");
       rObserver.onCompleted();
     }
 
     @Override
     public void sendResult(DataMessage msg, StreamObserver<DataMessage> rObserver) {
       if (!msg.getType().equals(DataMessageType.SEND_RESULT)) return;
+      LOG.info("Recieved result from worker");
       Matrix tempC;
       try {
         tempC = Matrix.fromByteString(msg.getA());
@@ -101,8 +103,7 @@ public class Coordinator {
         e.printStackTrace();
         return;
       }
-      LOG.info(msg.getIndexes());
-      LOG.info(tempC.toString());
+      
       if (msg.getIndex() < 5) {
         C1.incrementFromMatrixIndexes(tempC, MatrixIndexes.fromIndexes(msg.getIndexes()));
       } else if (msg.getIndex() < 9) {
@@ -113,7 +114,6 @@ public class Coordinator {
       rObserver.onCompleted();
 
       queue.incrementCount();
-      LOG.info(queue.getCount());
       if (queue.isDone()) {
         server.shutdown();
       }

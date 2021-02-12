@@ -29,4 +29,5 @@ hs_err_pid*
 *.classpath
 *.project
 *.factorypath
+single-node-threaded/.factorypath
 logs/

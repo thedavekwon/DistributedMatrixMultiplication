@@ -16,6 +16,10 @@ public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplicatio
     super(ThreadPooledNaiveParallelMultiplication.class.toString());
   }
 
+  public ThreadPooledNaiveParallelMultiplication(int split) {
+    super(ThreadPooledNaiveParallelMultiplication.class.toString(), split);
+  }
+
   @Override
   public void multiplyWithIndexes(
       Matrix A,
@@ -47,7 +51,7 @@ public class ThreadPooledNaiveParallelMultiplication extends MatrixMultiplicatio
     private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
     public void run() {
-      if (size <= A.getRow() / 4) {
+      if (size <= A.getRow() / split) {
         SerialMatrixMultiplication.multiplyWithIndex(
             A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
       } else {

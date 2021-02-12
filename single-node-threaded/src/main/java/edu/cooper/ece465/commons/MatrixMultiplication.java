@@ -6,10 +6,17 @@ import org.apache.log4j.Logger;
 
 public abstract class MatrixMultiplication {
   private String type;
+  protected int split;
   protected Logger LOG = Logger.getLogger(this.getClass());
 
+  public MatrixMultiplication(String type_, int split_) {
+    type = type_;
+    split = split_;
+  }
+  
   public MatrixMultiplication(String type_) {
     type = type_;
+    split = 4;
   }
 
   public abstract void multiplyWithIndexes(
