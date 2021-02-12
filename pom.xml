@@ -27,9 +27,11 @@
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
     <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
     <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+    
     <ece465-commons.version>${project.version}</ece465-commons.version>
     <single-node-threaded.version>${project.version}</single-node-threaded.version>
-
+    <multi-node-threaded.version>${project.version}</multi-node-threaded.version>
+    
     <log4j.version>1.2.17</log4j.version>
     <slf4j.version>1.7.30</slf4j.version>
     <junit-version>4.13.1</junit-version>
@@ -245,6 +247,11 @@
           <groupId>edu.cooper.ece465</groupId>
           <artifactId>single-node-threaded</artifactId>
         </dependency>
+        
+        <dependency>
+          <groupId>edu.cooper.ece465</groupId>
+          <artifactId>multi-node-threaded</artifactId>
+        </dependency>
 
       </dependencies>
     </profile>
@@ -259,7 +266,7 @@
       <modules>
         <module>commons</module>
         <module>single-node-threaded</module>
-        <!-- <module>dist-image</module> -->
+        <module>multi-node-threaded</module>
       </modules>
     </profile>
 
@@ -278,6 +285,7 @@
       <id>non_commons</id>
       <modules>
         <module>single-node-threaded</module>
+        <module>multi-node-threaded</module>
       </modules>
     </profile>
 
@@ -325,6 +333,13 @@
 				<artifactId>single-node-threaded</artifactId>
 				<version>${single-node-threaded.version}</version>
 			</dependency>
+			
+			<dependency>
+				<groupId>edu.cooper.ece465</groupId>
+				<artifactId>multi-node-threaded</artifactId>
+				<version>${multi-node-threaded.version}</version>
+			</dependency>
+
 
       <dependency>
         <groupId>junit</groupId>

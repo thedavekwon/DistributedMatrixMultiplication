@@ -15,10 +15,21 @@ public class ThreadPooledParallelMultiplication extends MatrixMultiplication {
     super(ThreadPooledParallelMultiplication.class.toString());
   }
 
-  public void multiply(Matrix A, Matrix B, Matrix C) {
+  @Override
+  public void multiplyWithIndexes(
+      Matrix A,
+      Matrix B,
+      Matrix C,
+      int A_i,
+      int A_j,
+      int B_i,
+      int B_j,
+      int C_i,
+      int C_j,
+      int size) {
     // exec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     Future<?> f =
-        exec.submit(new ThreadPooledParallelMultiply(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow()));
+        exec.submit(new ThreadPooledParallelMultiply(A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size));
     try {
       f.get();
       exec.shutdown();
