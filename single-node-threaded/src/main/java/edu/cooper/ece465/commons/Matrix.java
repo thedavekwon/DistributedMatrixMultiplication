@@ -1,9 +1,19 @@
 package edu.cooper.ece465.commons;
 
+import com.google.protobuf.ByteString;
+import edu.cooper.ece465.Indexes;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Random;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-public class Matrix {
+public class Matrix implements Serializable {
+  private static final long serialVersionUID = 1L;
   private int[][] array;
   @Getter private int row;
   @Getter private int col;
@@ -40,6 +50,10 @@ public class Matrix {
     return new Matrix(array_);
   }
 
+  public static Matrix like(Matrix m) {
+    return new Matrix(m.getRow(), m.getCol());
+  }
+
   public void incrementValue(int i, int j, int val) {
     array[i][j] += val;
   }
@@ -58,6 +72,25 @@ public class Matrix {
         array[i][j] = 0;
       }
     }
+  }
+
+  public ByteString toByteString() throws IOException {
+    ByteArrayOutputStream b = new ByteArrayOutputStream();
+    ObjectOutputStream o = new ObjectOutputStream(b);
+    o.writeObject(this);
+    ByteString data = ByteString.copyFrom(b.toByteArray());
+    b.close();
+    o.close();
+    return data;
+  }
+
+  public static Matrix fromByteString(ByteString data) throws IOException, ClassNotFoundException {
+    ByteArrayInputStream b = new ByteArrayInputStream(data.toByteArray());
+    ObjectInputStream o = new ObjectInputStream(b);
+    Matrix matrix = (Matrix) o.readObject();
+    b.close();
+    o.close();
+    return matrix;
   }
 
   @Override
@@ -92,6 +125,47 @@ public class Matrix {
       for (int j = 0; j < col; j++) {
         array[i][j] += m1.getValue(i, j) + m2.getValue(i, j);
       }
+    }
+  }
+
+  public void incrementFromMatrixIndexes(Matrix m, MatrixIndexes indexes) {
+    for (int i = indexes.getC_i(); i < indexes.getC_i() + indexes.getSize(); i++) {
+      for (int j = indexes.getC_j(); j < indexes.getC_j() + indexes.getSize(); j++) {
+        array[i][j] += m.getValue(i, j);
+      }
+    }
+  }
+
+  @AllArgsConstructor
+  public static class MatrixIndexes {
+    @Getter private int A_i, A_j, B_i, B_j, C_i, C_j, size;
+
+    public static MatrixIndexes fromIndexes(Indexes indexes) {
+      return new MatrixIndexes(
+          indexes.getAI(),
+          indexes.getAJ(),
+          indexes.getBI(),
+          indexes.getBJ(),
+          indexes.getCI(),
+          indexes.getCJ(),
+          indexes.getSize());
+    }
+
+    public Indexes toIndexes() {
+      return Indexes.newBuilder()
+          .setAI(A_i)
+          .setAJ(A_j)
+          .setBI(B_i)
+          .setBJ(B_j)
+          .setCI(C_i)
+          .setCJ(C_j)
+          .setSize(size)
+          .build();
+    }
+
+    @Override
+    public String toString() {
+      return A_i + ", " + A_j + ", " + B_i + ", " + B_j + ", " + C_i + ", " + C_j + ", " + size;
     }
   }
 }

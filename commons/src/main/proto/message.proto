@@ -1,0 +1,40 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package edu.cooper.ece465;
+
+service Coordinator {
+  rpc replyHeartBeat(HeartBeatRequest) returns (HeartBeatReply) {}
+
+  rpc requestResource(DataMessage) returns (DataMessage) {}
+
+  rpc sendResult(DataMessage) returns (DataMessage) {}
+}
+
+message HeartBeatRequest {}
+
+message HeartBeatReply {}
+
+message DataMessage {
+  bytes A = 1;
+  bytes B = 2;
+  int32 index = 3;
+  Indexes indexes = 4;
+  DataMessageType type = 5;
+}
+
+message Indexes {
+  int32 A_i = 1;
+  int32 A_j = 2;
+  int32 B_i = 3;
+  int32 B_j = 4;
+  int32 C_i = 5;
+  int32 C_j = 6;
+  int32 size = 7;
+}
+
+enum DataMessageType {
+  SEND_REQUEST = 0;
+  REPLY_REQUEST = 1;
+  SEND_RESULT = 2;
+  REPLY_RESULT = 3;
+}

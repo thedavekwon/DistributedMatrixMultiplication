@@ -5,8 +5,19 @@ public class SerialMatrixMultiplication extends MatrixMultiplication {
     super(SerialMatrixMultiplication.class.toString());
   }
 
-  public void multiply(Matrix A, Matrix B, Matrix C) {
-    multiplyWithIndex(A, B, C, 0, 0, 0, 0, 0, 0, A.getRow(), B.getCol(), A.getCol());
+  @Override
+  public void multiplyWithIndexes(
+      Matrix A,
+      Matrix B,
+      Matrix C,
+      int A_i,
+      int A_j,
+      int B_i,
+      int B_j,
+      int C_i,
+      int C_j,
+      int size) {
+    multiplyWithIndex(A, B, C, A_i, A_j, B_i, B_j, C_i, C_j, size, size, size);
   }
 
   public static void multiplyWithIndex(
