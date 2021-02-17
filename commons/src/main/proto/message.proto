@@ -29,7 +29,6 @@ message DiscoverResult{
   int32 workerId =1;
 }
 
-
 message DataMessage {
   bytes A = 1;
   bytes B = 2;

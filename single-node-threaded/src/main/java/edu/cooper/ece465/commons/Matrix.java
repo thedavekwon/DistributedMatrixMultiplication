@@ -74,9 +74,9 @@ public class Matrix implements Serializable {
     }
   }
 
-  public Matrix split_with_index(int idx) {
-    assert idx<=4 && idx >=1;
+  public Quartet<Integer, Integer, Integer, Integer> getSplitIndex(int idx) {
     int i_start, j_start, i_end, j_end;
+    idx = idx % 4;
     if (idx == 1) {
       i_start = 0;
       j_start = 0;
@@ -98,9 +98,15 @@ public class Matrix implements Serializable {
       i_end = row;
       j_end = col;
     }
+    return new Quartet<Integer, Integer, Integer, Integer>(i_start, j_start, i_end, j_end);
+  }
+
+  public Matrix splitWithIndex(int idx) {
+    assert idx<=8 && idx >=1;
+    Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
     Matrix m = new Matrix(row/2, col/2);
-    for (int i = i_start; i < i_end; i++) {
-      for (int j = j_start; j < j_end; j++) {
+    for (int i = indices.getValue0(); i < indices.getValue2(); i++) {
+      for (int j = indices.getValue1(); j < indices.getValue3(); j++) {
         m.setValue(i, j, array[i][j]);
       }
     }
@@ -108,7 +114,11 @@ public class Matrix implements Serializable {
   }
 
   public Quartet<Matrix, Matrix, Matrix, Matrix> split4() {
-    return new Quartet(split_with_index(1), split_with_index(2), split_with_index(3), split_with_index(4));
+    """
+    Splits into 4 submatrices M11 M12
+                              M21 M22
+    """
+    return new Quartet(splitWithIndex(1), splitWithIndex(2), splitWithIndex(3), splitWithIndex(4));
   }
 
   public ByteString toByteString() throws IOException {
@@ -161,6 +171,15 @@ public class Matrix implements Serializable {
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < col; j++) {
         array[i][j] += m1.getValue(i, j) + m2.getValue(i, j);
+      }
+    }
+  }
+
+  public void incrementFromSubmatrix(Matrix m, int idx) {
+    Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
+    for (int i = indices.getValue0(); i < indices.getValue2(); i++) {
+      for (int j = indices.getValue1(); j < indices.getValue3(); j++) {
+        m.incrementValue(i, j, array[i][j]);
       }
     }
   }
