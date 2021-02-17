@@ -1,7 +1,6 @@
 package edu.cooper.ece465.commons;
 
 import com.google.protobuf.ByteString;
-import edu.cooper.ece465.Indexes;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,6 +10,7 @@ import java.io.Serializable;
 import java.util.Random;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.javatuples.Quartet;
 
 public class Matrix implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -74,13 +74,42 @@ public class Matrix implements Serializable {
     }
   }
 
-  // public List<Matrix> split4(int i) {
-  //   for (int i = 0; i < row; i++) {
-  //     for (int j = 0; j < col; j++) {
-  //       array[i][j] = 0;
-  //     }
-  //   }
-  // }
+  public Matrix split_with_index(int idx) {
+    assert idx<=4 && idx >=1;
+    int i_start, j_start, i_end, j_end;
+    if (idx == 1) {
+      i_start = 0;
+      j_start = 0;
+      i_end = row/2;
+      j_end = col/2;
+    } else if (idx == 2) {
+      i_start = 0;
+      j_start = col/2;
+      i_end = row/2;
+      j_end = col;
+    } else if (idx == 3) {
+      i_start = row/2;
+      j_start = 0;
+      i_end = row;
+      j_end = col/2;
+    } else {
+      i_start = row/2;
+      j_start = col/2;
+      i_end = row;
+      j_end = col;
+    }
+    Matrix m = new Matrix(row/2, col/2);
+    for (int i = i_start; i < i_end; i++) {
+      for (int j = j_start; j < j_end; j++) {
+        m.setValue(i, j, array[i][j]);
+      }
+    }
+    return m;
+  }
+
+  public Quartet<Matrix, Matrix, Matrix, Matrix> split4() {
+    return new Quartet(split_with_index(1), split_with_index(2), split_with_index(3), split_with_index(4));
+  }
 
   public ByteString toByteString() throws IOException {
     ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -133,47 +162,6 @@ public class Matrix implements Serializable {
       for (int j = 0; j < col; j++) {
         array[i][j] += m1.getValue(i, j) + m2.getValue(i, j);
       }
-    }
-  }
-
-  public void incrementFromMatrixIndexes(Matrix m, MatrixIndexes indexes) {
-    for (int i = indexes.getC_i(); i < indexes.getC_i() + indexes.getSize(); i++) {
-      for (int j = indexes.getC_j(); j < indexes.getC_j() + indexes.getSize(); j++) {
-        array[i][j] += m.getValue(i, j);
-      }
-    }
-  }
-
-  @AllArgsConstructor
-  public static class MatrixIndexes {
-    @Getter private int A_i, A_j, B_i, B_j, C_i, C_j, size;
-
-    public static MatrixIndexes fromIndexes(Indexes indexes) {
-      return new MatrixIndexes(
-          indexes.getAI(),
-          indexes.getAJ(),
-          indexes.getBI(),
-          indexes.getBJ(),
-          indexes.getCI(),
-          indexes.getCJ(),
-          indexes.getSize());
-    }
-
-    public Indexes toIndexes() {
-      return Indexes.newBuilder()
-          .setAI(A_i)
-          .setAJ(A_j)
-          .setBI(B_i)
-          .setBJ(B_j)
-          .setCI(C_i)
-          .setCJ(C_j)
-          .setSize(size)
-          .build();
-    }
-
-    @Override
-    public String toString() {
-      return A_i + ", " + A_j + ", " + B_i + ", " + B_j + ", " + C_i + ", " + C_j + ", " + size;
     }
   }
 }

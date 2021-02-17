@@ -1,6 +1,5 @@
 package edu.cooper.ece465.commons;
 
-import edu.cooper.ece465.commons.Matrix.MatrixIndexes;
 import java.util.Date;
 import org.apache.log4j.Logger;
 
@@ -19,25 +18,11 @@ public abstract class MatrixMultiplication {
     split = 4;
   }
 
-  public abstract void multiplyWithIndexes(
+  public abstract void multiplyWithIndices(
       Matrix A, Matrix B, Matrix C, int A_i, int A_j, int B_i, int B_j, int C_i, int C_j, int size);
 
-  public void multiplyWithMatrixIndexes(Matrix A, Matrix B, Matrix C, MatrixIndexes indexes) {
-    multiplyWithIndexes(
-        A,
-        B,
-        C,
-        indexes.getA_i(),
-        indexes.getA_j(),
-        indexes.getB_i(),
-        indexes.getB_j(),
-        indexes.getC_i(),
-        indexes.getC_j(),
-        indexes.getSize());
-  }
-
   public void multiply(Matrix A, Matrix B, Matrix C) {
-    multiplyWithIndexes(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow());
+    multiplyWithIndices(A, B, C, 0, 0, 0, 0, 0, 0, C.getRow());
   }
 
   public long multiplyWithTimeMeasure(Matrix A, Matrix B, Matrix C) {
