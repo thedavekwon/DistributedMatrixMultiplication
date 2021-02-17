@@ -95,5 +95,14 @@ public class Worker {
         }
       };
     }
+
+    @Override
+    public void control(ControlMessage controlMessage, StreamObserver<ControlMessage> rObserver) {
+      if (controlMessage.getType() == ControlMessageType.CHECK_AVAILABLE) {
+
+      } else if (controlMessage.getType() == ControlMessageType.KILL) {
+        
+      }
+    }
   }
 }

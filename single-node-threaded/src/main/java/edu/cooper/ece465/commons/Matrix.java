@@ -98,27 +98,27 @@ public class Matrix implements Serializable {
       i_end = row;
       j_end = col;
     }
-    return new Quartet<Integer, Integer, Integer, Integer>(i_start, j_start, i_end, j_end);
+    return Quartet.with(i_start, j_start, i_end, j_end);
   }
 
   public Matrix splitWithIndex(int idx) {
     assert idx<=8 && idx >=1;
     Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
     Matrix m = new Matrix(row/2, col/2);
-    for (int i = indices.getValue0(); i < indices.getValue2(); i++) {
-      for (int j = indices.getValue1(); j < indices.getValue3(); j++) {
-        m.setValue(i, j, array[i][j]);
+    for (int i = 0; i < row/2; i++) {
+      for (int j = 0; j < col/2; j++) {
+        m.setValue(i, j, array[i+indices.getValue0()][j+indices.getValue1()]);
       }
     }
     return m;
   }
 
   public Quartet<Matrix, Matrix, Matrix, Matrix> split4() {
-    """
+    /*
     Splits into 4 submatrices M11 M12
                               M21 M22
-    """
-    return new Quartet(splitWithIndex(1), splitWithIndex(2), splitWithIndex(3), splitWithIndex(4));
+    */
+    return Quartet.with(splitWithIndex(1), splitWithIndex(2), splitWithIndex(3), splitWithIndex(4));
   }
 
   public ByteString toByteString() throws IOException {
