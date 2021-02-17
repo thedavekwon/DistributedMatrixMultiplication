@@ -9,7 +9,13 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import com.google.protobuf.ByteString;
+
 import org.apache.log4j.Logger;
 
 public class Worker {
@@ -23,18 +29,25 @@ public class Worker {
   public void start() throws ClassNotFoundException, IOException {
     DataMessage message = DataMessage.newBuilder().setType(DataMessageType.SEND_REQUEST).build();
     DataMessage response;
+    Iterator<DataMessage> responses;
     try {
-      response = blockingStub.requestResource(message);
+      responses = blockingStub.requestResource(message);
     } catch (StatusRuntimeException e) {
       LOG.error("RPC failed " + e);
       return;
     }
+    List<DataMessage> responseList = new ArrayList<DataMessage>();
+    while (responses.hasNext()) {
+      responseList.add(responses.next());
+    }
     LOG.info("Recieved response from coordinator");
-    Matrix A = Matrix.fromByteString(response.getA());
-    Matrix B = Matrix.fromByteString(response.getB());
+    ByteString subA = responseList.get(0).getA().concat(responseList.get(1).getA());
+    ByteString subB = responseList.get(0).getB().concat(responseList.get(1).getB());
+    Matrix A = Matrix.fromByteString(subA);
+    Matrix B = Matrix.fromByteString(subB);
     
-    int index = response.getIndex();
-    Indexes indexes = response.getIndexes();
+    int index = responseList.get(0).getIndex();
+    Indexes indexes = responseList.get(0).getIndexes();
     Matrix C = Matrix.like(A);
     new ThreadPooledNaiveParallelMultiplication(8)
         .multiplyWithMatrixIndexes(A, B, C, MatrixIndexes.fromIndexes(indexes));

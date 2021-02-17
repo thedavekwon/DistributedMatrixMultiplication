@@ -74,6 +74,14 @@ public class Matrix implements Serializable {
     }
   }
 
+  // public List<Matrix> split4(int i) {
+  //   for (int i = 0; i < row; i++) {
+  //     for (int j = 0; j < col; j++) {
+  //       array[i][j] = 0;
+  //     }
+  //   }
+  // }
+
   public ByteString toByteString() throws IOException {
     ByteArrayOutputStream b = new ByteArrayOutputStream();
     ObjectOutputStream o = new ObjectOutputStream(b);

@@ -2,39 +2,36 @@ syntax = "proto3";
 option java_multiple_files = true;
 package edu.cooper.ece465;
 
+// compress before making into bytestream
+// send partial
+// timeout for fault tolerant
+// compressing huffman coding
+
+// 1. Workers send their availability to the coordinator
+// 2. The coordinator stores available workers as a worker pool
+// 3. The coordinator sends each split to the available worker with a timeout
+// 4. A worker compute the split and sends the result back to the coordinator
+// 5. If the worker fails to compute (time out), the coordinator sends the split to other worker
+// 6. The coordinator adds all the computed splits, and return the results
+// 7. The coordinator sends computation done message to all workers and wait until confirmation
+
 service Coordinator {
-  rpc replyHeartBeat(HeartBeatRequest) returns (HeartBeatReply) {}
-
-  rpc requestResource(DataMessage) returns (DataMessage) {}
-
-  rpc sendResult(DataMessage) returns (DataMessage) {}
+  rpc discoverWorker(discoverRequest) returns (discoverResult) {}
 }
 
-message HeartBeatRequest {}
+service Worker {
+  rpc requestCompute(stream DataMessage) returns (stream DataMessage) {}
+}
 
-message HeartBeatReply {}
+message discoverRequest{}
+
+message discoverResult{
+  int32 workerId =1;
+}
+
 
 message DataMessage {
   bytes A = 1;
   bytes B = 2;
-  int32 index = 3;
-  Indexes indexes = 4;
-  DataMessageType type = 5;
-}
-
-message Indexes {
-  int32 A_i = 1;
-  int32 A_j = 2;
-  int32 B_i = 3;
-  int32 B_j = 4;
-  int32 C_i = 5;
-  int32 C_j = 6;
-  int32 size = 7;
-}
-
-enum DataMessageType {
-  SEND_REQUEST = 0;
-  REPLY_REQUEST = 1;
-  SEND_RESULT = 2;
-  REPLY_RESULT = 3;
+  int32 index = 3; // 1~8
 }

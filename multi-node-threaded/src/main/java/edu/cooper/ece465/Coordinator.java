@@ -7,6 +7,10 @@ import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import javax.xml.crypto.Data;
+
+import com.google.protobuf.ByteString;
+
 import org.apache.log4j.Logger;
 import org.javatuples.Pair;
 
@@ -35,7 +39,7 @@ public class Coordinator {
                 try {
                   Coordinator.this.stop();
                 } catch (InterruptedException e) {
-                  LOG.error(e);
+                  LOG.error("Thread no sucessfully started" + e);
                   e.printStackTrace();
                 }
               }
@@ -59,7 +63,7 @@ public class Coordinator {
 
     server.start();
     server.blockUntilShutdown();
-
+    LOG.info("Server shutdown");
     C.incrementFromMatrices(C1, C2);
     LOG.info(A.equals(C));
   }
@@ -67,39 +71,60 @@ public class Coordinator {
   static class CoordinatorImpl extends CoordinatorGrpc.CoordinatorImplBase {
     @Override
     public void requestResource(DataMessage msg, StreamObserver<DataMessage> rObserver) {
-      if (!msg.getType().equals(DataMessageType.SEND_REQUEST)) return;
       if (queue.getSize() == 0) return;
-      LOG.info("Recieved resource request");
+      LOG.info("Recieved matrix resource request");
       Pair<Integer, MatrixIndexes> p = queue.poll();
-      DataMessage response;
+      DataMessage response = DataMessage.newBuilder().build();
       try {
-        response =
-            DataMessage.newBuilder()
-                .setType(DataMessageType.REPLY_REQUEST)
-                .setA(A.toByteString())
-                .setB(B.toByteString())
-                .setIndexes(p.getValue1().toIndexes())
-                .setIndex(p.getValue0())
-                .build();
+        if(N <= 512){
+          response =
+              DataMessage.newBuilder()
+                  .setA(A.toByteString())
+                  .setB(B.toByteString())
+                  .setIndexes(p.getValue1().toIndexes())
+                  .setIndex(p.getValue0())
+                  .build();
+          rObserver.onNext(response);
+        } else if (N > 512){
+          ByteString ABytes = A.toByteString();
+          ByteString BBytes = B.toByteString();
+          response =
+              DataMessage.newBuilder()
+                  .setA(ABytes.substring(0, ABytes.size()/2))
+                  .setB(BBytes.substring(0, BBytes.size()/2))
+                  .setIndexes(p.getValue1().toIndexes())
+                  .setIndex(p.getValue0())
+                  .build();
+          rObserver.onNext(response);
+          
+          response =
+              DataMessage.newBuilder()
+                  .setA(ABytes.substring(ABytes.size()/2))
+                  .setB(ABytes.substring(BBytes.size()/2))
+                  .setIndexes(p.getValue1().toIndexes())
+                  .setIndex(p.getValue0())
+                  .build();
+          rObserver.onNext(response);
+        }
       } catch (IOException e) {
         // TODO Auto-generated catch block
+        LOG.error("Response built incorrectly" + e);
         e.printStackTrace();
         return;
       }
-      rObserver.onNext(response);
-      LOG.info("Send resource to worker");
+      LOG.info("Sent matrix response to worker");
       rObserver.onCompleted();
     }
 
     @Override
     public void sendResult(DataMessage msg, StreamObserver<DataMessage> rObserver) {
-      if (!msg.getType().equals(DataMessageType.SEND_RESULT)) return;
-      LOG.info("Recieved result from worker");
+      LOG.info("Recieved matrix result from worker");
       Matrix tempC;
       try {
         tempC = Matrix.fromByteString(msg.getA());
       } catch (ClassNotFoundException | IOException e) {
         // TODO Auto-generated catch block
+        LOG.error("Unknown class type" + e);
         e.printStackTrace();
         return;
       }
@@ -109,7 +134,7 @@ public class Coordinator {
       } else if (msg.getIndex() < 9) {
         C2.incrementFromMatrixIndexes(tempC, MatrixIndexes.fromIndexes(msg.getIndexes()));
       }
-      DataMessage response = DataMessage.newBuilder().setType(DataMessageType.REPLY_RESULT).build();
+      DataMessage response = DataMessage.newBuilder().build();
       rObserver.onNext(response);
       rObserver.onCompleted();
 
