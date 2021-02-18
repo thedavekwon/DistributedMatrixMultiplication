@@ -25,4 +25,5 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/codehaus/mojo/animal-sniffer-annotations/1.19/animal-sniffer-annotations-1.19.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/grpc/grpc-stub/1.35.0/grpc-stub-1.35.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/tomcat/annotations-api/6.0.53/annotations-api-6.0.53.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/javatuples/javatuples/1.2/javatuples-1.2.jar" enabled="true" runInBatchMode="false"/>
 </factorypath>

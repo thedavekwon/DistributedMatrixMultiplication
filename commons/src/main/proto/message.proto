@@ -21,6 +21,8 @@ service Coordinator {
 
 service Worker {
   rpc requestCompute(stream DataMessage) returns (stream DataMessage) {}
+
+  rpc control(ControlMessage) returns (ControlMessage) {}
 }
 
 message DiscoverRequest{
@@ -29,11 +31,24 @@ message DiscoverRequest{
 
 message DiscoverResult{
   int32 workerId = 1;
-}
+message DiscoverRequest{}
 
+message DiscoverResult{
+  int32 workerId =1;
+}
 
 message DataMessage {
   bytes A = 1;
   bytes B = 2;
   int32 index = 3; // 1~8
+}
+
+message ControlMessage {
+  ControlMessageType type = 1;
+  bool succeed = 2;
+}
+
+enum ControlMessageType {
+  KILL = 0;
+  CHECK_AVAILABLE = 1;
 }

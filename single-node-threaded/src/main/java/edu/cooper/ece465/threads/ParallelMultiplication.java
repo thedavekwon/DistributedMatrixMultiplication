@@ -11,7 +11,7 @@ public class ParallelMultiplication extends MatrixMultiplication {
   }
 
   @Override
-  public void multiplyWithIndexes(
+  public void multiplyWithIndices(
       Matrix A,
       Matrix B,
       Matrix C,

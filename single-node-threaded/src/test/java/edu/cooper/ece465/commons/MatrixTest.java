@@ -3,6 +3,7 @@ package edu.cooper.ece465.commons;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.javatuples.Quartet;
 
 public class MatrixTest {
   private static int N = 4;
@@ -66,5 +67,27 @@ public class MatrixTest {
                   {3, 3, 3, 3},
                   {3, 3, 3, 3},
                 })));
+  }
+
+  @Test
+  public void split4() {
+    int[][] array =
+        new int[][] {
+          {1, 1, 2, 2},
+          {1, 1, 2, 2},
+          {3, 3, 4, 4},
+          {3, 3, 4, 4},
+        };
+    Matrix m = new Matrix(array);
+    Quartet<Matrix, Matrix, Matrix, Matrix> matrices = m.split4();
+
+    for (int i = 1; i < 5; i++) {
+      Matrix t = (Matrix) matrices.getValue(i-1);
+      for (int j = 0; j < 2; j++) {
+        for (int k = 0; k < 2; k++) {
+          assertTrue(t.getValue(j, k) == i);
+        }
+      }
+    }
   }
 }

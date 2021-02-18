@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Random;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.javatuples.Quartet;
 
 public class Matrix implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -73,13 +74,52 @@ public class Matrix implements Serializable {
     }
   }
 
-  // public List<Matrix> split4(int i) {
-  //   for (int i = 0; i < row; i++) {
-  //     for (int j = 0; j < col; j++) {
-  //       array[i][j] = 0;
-  //     }
-  //   }
-  // }
+  public Quartet<Integer, Integer, Integer, Integer> getSplitIndex(int idx) {
+    int i_start, j_start, i_end, j_end;
+    idx = idx % 4;
+    if (idx == 1) {
+      i_start = 0;
+      j_start = 0;
+      i_end = row/2;
+      j_end = col/2;
+    } else if (idx == 2) {
+      i_start = 0;
+      j_start = col/2;
+      i_end = row/2;
+      j_end = col;
+    } else if (idx == 3) {
+      i_start = row/2;
+      j_start = 0;
+      i_end = row;
+      j_end = col/2;
+    } else {
+      i_start = row/2;
+      j_start = col/2;
+      i_end = row;
+      j_end = col;
+    }
+    return Quartet.with(i_start, j_start, i_end, j_end);
+  }
+
+  public Matrix splitWithIndex(int idx) {
+    assert idx<=8 && idx >=1;
+    Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
+    Matrix m = new Matrix(row/2, col/2);
+    for (int i = 0; i < row/2; i++) {
+      for (int j = 0; j < col/2; j++) {
+        m.setValue(i, j, array[i+indices.getValue0()][j+indices.getValue1()]);
+      }
+    }
+    return m;
+  }
+
+  public Quartet<Matrix, Matrix, Matrix, Matrix> split4() {
+    /*
+    Splits into 4 submatrices M11 M12
+                              M21 M22
+    */
+    return Quartet.with(splitWithIndex(1), splitWithIndex(2), splitWithIndex(3), splitWithIndex(4));
+  }
 
   public ByteString toByteString() throws IOException {
     ByteArrayOutputStream b = new ByteArrayOutputStream();
@@ -175,4 +215,12 @@ public class Matrix implements Serializable {
   //     return A_i + ", " + A_j + ", " + B_i + ", " + B_j + ", " + C_i + ", " + C_j + ", " + size;
   //   }
   // }
+  public void incrementFromSubmatrix(Matrix m, int idx) {
+    Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
+    for (int i = indices.getValue0(); i < indices.getValue2(); i++) {
+      for (int j = indices.getValue1(); j < indices.getValue3(); j++) {
+        m.incrementValue(i, j, array[i][j]);
+      }
+    }
+  }
 }
