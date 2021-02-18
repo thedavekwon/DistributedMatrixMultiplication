@@ -2,6 +2,7 @@ package edu.cooper.ece465;
 
 import edu.cooper.ece465.commons.Matrix;
 import edu.cooper.ece465.commons.Matrix.MatrixIndexes;
+import java.util.concurrent.ArrayBlockingQueue;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
@@ -18,11 +19,13 @@ public class Coordinator {
   private static final Logger LOG = Logger.getLogger(Coordinator.class);
 
   private static int N = 512;
+  private static int generateWorkerId = 0;
   private static Matrix A = Matrix.createRandomMatrix(N, N);
   private static Matrix B = Matrix.I(N, N);
   private static Matrix C = new Matrix(N, N);
   private static Matrix C1 = new Matrix(N, N);
   private static Matrix C2 = new Matrix(N, N);
+  private static ArrayBlockingQueue<Integer> workerQueue;
   private static CoordinatorQueue queue = new CoordinatorQueue(N);
   private static Server server;
 
@@ -69,6 +72,16 @@ public class Coordinator {
   }
 
   static class CoordinatorImpl extends CoordinatorGrpc.CoordinatorImplBase {
+    @Override
+    public void discoverWorker(DiscoverRequest req, StreamObserver<DiscoverResult> rObserver) {
+      if(!req.getIsAvailible()) return;
+      LOG.info("Recieved discoverRequest");
+      DiscoverResult response = DiscoverResult.newBuilder().setWorkerId(generateWorkerId).build();
+      workerQueue.add(generateWorkerId);
+      generateWorkerId++;
+      rObserver.onNext(response);
+      rObserver.onCompleted();
+    }
     @Override
     public void requestResource(DataMessage msg, StreamObserver<DataMessage> rObserver) {
       if (queue.getSize() == 0) return;

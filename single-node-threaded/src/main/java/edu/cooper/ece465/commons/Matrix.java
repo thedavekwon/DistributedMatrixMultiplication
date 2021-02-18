@@ -1,7 +1,6 @@
 package edu.cooper.ece465.commons;
 
 import com.google.protobuf.ByteString;
-import edu.cooper.ece465.Indexes;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -136,44 +135,44 @@ public class Matrix implements Serializable {
     }
   }
 
-  public void incrementFromMatrixIndexes(Matrix m, MatrixIndexes indexes) {
-    for (int i = indexes.getC_i(); i < indexes.getC_i() + indexes.getSize(); i++) {
-      for (int j = indexes.getC_j(); j < indexes.getC_j() + indexes.getSize(); j++) {
-        array[i][j] += m.getValue(i, j);
-      }
-    }
-  }
+  // public void incrementFromMatrixIndexes(Matrix m, MatrixIndexes indexes) {
+  //   for (int i = indexes.getC_i(); i < indexes.getC_i() + indexes.getSize(); i++) {
+  //     for (int j = indexes.getC_j(); j < indexes.getC_j() + indexes.getSize(); j++) {
+  //       array[i][j] += m.getValue(i, j);
+  //     }
+  //   }
+  // }
 
-  @AllArgsConstructor
-  public static class MatrixIndexes {
-    @Getter private int A_i, A_j, B_i, B_j, C_i, C_j, size;
+  // @AllArgsConstructor
+  // public static class MatrixIndexes {
+  //   @Getter private int A_i, A_j, B_i, B_j, C_i, C_j, size;
 
-    public static MatrixIndexes fromIndexes(Indexes indexes) {
-      return new MatrixIndexes(
-          indexes.getAI(),
-          indexes.getAJ(),
-          indexes.getBI(),
-          indexes.getBJ(),
-          indexes.getCI(),
-          indexes.getCJ(),
-          indexes.getSize());
-    }
+  //   public static MatrixIndexes fromIndexes(Indexes indexes) {
+  //     return new MatrixIndexes(
+  //         indexes.getAI(),
+  //         indexes.getAJ(),
+  //         indexes.getBI(),
+  //         indexes.getBJ(),
+  //         indexes.getCI(),
+  //         indexes.getCJ(),
+  //         indexes.getSize());
+  //   }
 
-    public Indexes toIndexes() {
-      return Indexes.newBuilder()
-          .setAI(A_i)
-          .setAJ(A_j)
-          .setBI(B_i)
-          .setBJ(B_j)
-          .setCI(C_i)
-          .setCJ(C_j)
-          .setSize(size)
-          .build();
-    }
+  //   public Indexes toIndexes() {
+  //     return Indexes.newBuilder()
+  //         .setAI(A_i)
+  //         .setAJ(A_j)
+  //         .setBI(B_i)
+  //         .setBJ(B_j)
+  //         .setCI(C_i)
+  //         .setCJ(C_j)
+  //         .setSize(size)
+  //         .build();
+  //   }
 
-    @Override
-    public String toString() {
-      return A_i + ", " + A_j + ", " + B_i + ", " + B_j + ", " + C_i + ", " + C_j + ", " + size;
-    }
-  }
+  //   @Override
+  //   public String toString() {
+  //     return A_i + ", " + A_j + ", " + B_i + ", " + B_j + ", " + C_i + ", " + C_j + ", " + size;
+  //   }
+  // }
 }

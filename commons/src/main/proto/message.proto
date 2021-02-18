@@ -16,17 +16,19 @@ package edu.cooper.ece465;
 // 7. The coordinator sends computation done message to all workers and wait until confirmation
 
 service Coordinator {
-  rpc discoverWorker(discoverRequest) returns (discoverResult) {}
+  rpc discoverWorker(DiscoverRequest) returns (DiscoverResult) {}
 }
 
 service Worker {
   rpc requestCompute(stream DataMessage) returns (stream DataMessage) {}
 }
 
-message discoverRequest{}
+message DiscoverRequest{
+  bool isAvailible = 1;
+}
 
-message discoverResult{
-  int32 workerId =1;
+message DiscoverResult{
+  int32 workerId = 1;
 }
 
 

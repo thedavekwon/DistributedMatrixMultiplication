@@ -8,6 +8,8 @@ import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
+import io.grpc.stub.StreamObserver;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +21,7 @@ import com.google.protobuf.ByteString;
 import org.apache.log4j.Logger;
 
 public class Worker {
+  private int id;
   private final Logger LOG = Logger.getLogger(Worker.class);
   private final CoordinatorGrpc.CoordinatorBlockingStub blockingStub;
 
@@ -27,15 +30,18 @@ public class Worker {
   }
 
   public void start() throws ClassNotFoundException, IOException {
-    DataMessage message = DataMessage.newBuilder().setType(DataMessageType.SEND_REQUEST).build();
-    DataMessage response;
-    Iterator<DataMessage> responses;
+    DiscoverRequest message = DiscoverRequest.newBuilder().setIsAvailible(true).build();
+    DiscoverResult response;
     try {
-      responses = blockingStub.requestResource(message);
+      response = blockingStub.discoverWorker(message);
     } catch (StatusRuntimeException e) {
       LOG.error("RPC failed " + e);
       return;
     }
+    LOG.info("Recieved DiscoverResult");
+    id = response.getWorkerId();
+
+
     List<DataMessage> responseList = new ArrayList<DataMessage>();
     while (responses.hasNext()) {
       responseList.add(responses.next());
@@ -76,6 +82,13 @@ public class Worker {
       worker.start();
     } finally {
       channel.shutdown().awaitTermination(30, TimeUnit.SECONDS);
+    }
+  }
+
+  static class WorkerImpl extends WorkerGrpc.WorkerImplBase {
+    
+    public void requestCompute(DataMessage msg, StreamObserver<DataMessage> rObserver){
+
     }
   }
 }
