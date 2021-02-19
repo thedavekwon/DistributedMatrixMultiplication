@@ -8,11 +8,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterOutputStream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.log4j.Logger;
 import org.javatuples.Quartet;
 
 public class Matrix implements Serializable {
+  private static final Logger LOG = Logger.getLogger(Matrix.class);
   private static final long serialVersionUID = 1L;
   private int[][] array;
   @Getter private int row;
@@ -118,20 +122,36 @@ public class Matrix implements Serializable {
   }
 
   public ByteString toByteString() throws IOException {
-    ByteArrayOutputStream b = new ByteArrayOutputStream();
-    ObjectOutputStream o = new ObjectOutputStream(b);
+    ByteArrayOutputStream b1 = new ByteArrayOutputStream();
+    ObjectOutputStream o = new ObjectOutputStream(b1);
     o.writeObject(this);
-    ByteString data = ByteString.copyFrom(b.toByteArray());
-    b.close();
+
+    ByteArrayOutputStream b2 = new ByteArrayOutputStream();
+    DeflaterOutputStream d = new DeflaterOutputStream(b2);
+    byte[] b = b1.toByteArray();
+    LOG.info(b);
+    d.write(b);
+    d.finish();
+    ByteString data = ByteString.copyFrom(b2.toByteArray());
+    d.close();
+    b2.close();
     o.close();
+    b1.close();
     return data;
   }
 
   public static Matrix fromByteString(ByteString data) throws IOException, ClassNotFoundException {
-    ByteArrayInputStream b = new ByteArrayInputStream(data.toByteArray());
-    ObjectInputStream o = new ObjectInputStream(b);
+    ByteArrayOutputStream b1 = new ByteArrayOutputStream();
+    InflaterOutputStream i = new InflaterOutputStream(b1);
+    i.write(data.toByteArray());
+    i.finish();
+    byte[] b = b1.toByteArray();
+    ByteArrayInputStream b2 = new ByteArrayInputStream(b);
+    ObjectInputStream o = new ObjectInputStream(b2);
     Matrix matrix = (Matrix) o.readObject();
-    b.close();
+    i.close();
+    b1.close();
+    b2.close();
     o.close();
     return matrix;
   }

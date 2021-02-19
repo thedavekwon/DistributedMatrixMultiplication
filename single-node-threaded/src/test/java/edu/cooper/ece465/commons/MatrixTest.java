@@ -2,6 +2,9 @@ package edu.cooper.ece465.commons;
 
 import static org.junit.Assert.assertTrue;
 
+
+import com.google.protobuf.ByteString;
+import java.io.IOException;
 import org.junit.Test;
 import org.javatuples.Quartet;
 
@@ -88,6 +91,25 @@ public class MatrixTest {
           assertTrue(t.getValue(j, k) == i);
         }
       }
+    }
+  }
+
+  @Test
+  public void compressedByteString() {
+    try {
+      int[][] array =
+          new int[][] {
+            {1, 1, 2, 2},
+            {1, 1, 2, 2},
+            {3, 3, 4, 4},
+            {3, 3, 4, 4},
+          };
+      Matrix m1 = new Matrix(array);
+      ByteString b = m1.toByteString();
+      Matrix m2 = Matrix.fromByteString(b);
+      assertTrue(m1.equals(m2));
+    } catch (Exception e) {
+      assertTrue(false); 
     }
   }
 }
