@@ -1,16 +1,13 @@
 package edu.cooper.ece465;
 
 import edu.cooper.ece465.commons.Matrix;
-<<<<<<< HEAD
-import edu.cooper.ece465.commons.Matrix.MatrixIndexes;
-import java.util.concurrent.ArrayBlockingQueue;
-=======
->>>>>>> origin/killworker
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
 import javax.xml.crypto.Data;
 
 import com.google.protobuf.ByteString;
@@ -22,7 +19,7 @@ import org.javatuples.Quartet;
 public class Coordinator {
   private static final Logger LOG = Logger.getLogger(Coordinator.class);
 
-  private static int N = 512;
+  private static int N = 64;
   private static int generateWorkerId = 0;
   private static Matrix A = Matrix.createRandomMatrix(N, N);
   private static Matrix B = Matrix.I(N, N);
@@ -46,7 +43,7 @@ public class Coordinator {
                 try {
                   Coordinator.this.stop();
                 } catch (InterruptedException e) {
-                  LOG.error("Thread no sucessfully started" + e);
+                  LOG.error("Thread not sucessfully started" + e);
                   e.printStackTrace();
                 }
               }
@@ -65,6 +62,8 @@ public class Coordinator {
     }
   }
 
+  
+
   public static void main(String[] args) throws IOException, InterruptedException {
     final Coordinator server = new Coordinator();
 
@@ -77,66 +76,141 @@ public class Coordinator {
 
   static class CoordinatorImpl extends CoordinatorGrpc.CoordinatorImplBase {
     @Override
-<<<<<<< HEAD
-    public void discoverWorker(DiscoverRequest req, StreamObserver<DiscoverResult> rObserver) {
-      if(!req.getIsAvailible()) return;
-      LOG.info("Recieved discoverRequest");
+    public void discoverWorker(DiscoverRequest discoverRequest, StreamObserver<DiscoverResult> rObserver) {
+      if(!(discoverRequest.getIsAvailible())) return;
+      LOG.info("Recieved DiscoverRequest from Worker");
       DiscoverResult response = DiscoverResult.newBuilder().setWorkerId(generateWorkerId).build();
-      workerQueue.add(generateWorkerId);
-      generateWorkerId++;
+      // workerQueue.add(generateWorkerId++);
       rObserver.onNext(response);
+      LOG.info("Sent DiscoverResult response to Worker");
       rObserver.onCompleted();
     }
+
     @Override
-    public void requestResource(DataMessage msg, StreamObserver<DataMessage> rObserver) {
-      if (queue.getSize() == 0) return;
-      LOG.info("Recieved matrix resource request");
-      Pair<Integer, MatrixIndexes> p = queue.poll();
-      DataMessage response = DataMessage.newBuilder().build();
+    public void requestCompute(ControlMessage controlMessage, StreamObserver<DataMessage> rObserver) {
+      if(queue.isEmpty()) return;
+      if(!(controlMessage.getType() == ControlMessageType.AVAILABLE)) return;
+      LOG.info("Recieved matrix resource request from Worker");
+      Quartet<Matrix, Matrix, Matrix, Matrix> splitMatrixA = A.split4();
+      Quartet<Matrix, Matrix, Matrix, Matrix> splitMatrixB = B.split4();
+      int taskNum = queue.selectTask();
+      switch (queue.selectTask()) {
+        case 1:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue0().toByteString())
+                .setB(splitMatrixB.getValue0().toByteString()).setIndex(1).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 2:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue0().toByteString())
+                .setB(splitMatrixB.getValue1().toByteString()).setIndex(2).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 3:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue2().toByteString())
+                .setB(splitMatrixB.getValue0().toByteString()).setIndex(3).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 4:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue2().toByteString())
+                .setB(splitMatrixB.getValue1().toByteString()).setIndex(4).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 5:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue1().toByteString())
+                .setB(splitMatrixB.getValue2().toByteString()).setIndex(5).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 6:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue1().toByteString())
+                .setB(splitMatrixB.getValue3().toByteString()).setIndex(6).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 7:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue3().toByteString())
+                .setB(splitMatrixB.getValue2().toByteString()).setIndex(7).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+        case 8:
+          try {
+            DataMessage response = DataMessage.newBuilder().setA(splitMatrixA.getValue3().toByteString())
+                .setB(splitMatrixB.getValue3().toByteString()).setIndex(8).build();
+            rObserver.onNext(response);
+          } catch (IOException e) {
+            LOG.error("requestCompute response could not be sent");
+            e.printStackTrace();
+          }
+          break;
+      }
+      LOG.info("Sent matrix resource to Worker");
+      queue.removeTask(taskNum);
+      rObserver.onCompleted();
+
+    }
+    
+    @Override
+    public void sendResult(ResultMessage msg, StreamObserver<ControlMessage> rObserver) {
+      LOG.info("Recieved compute result from Worker");
+      Matrix tempC;
       try {
-        if(N <= 512){
-          response =
-              DataMessage.newBuilder()
-                  .setA(A.toByteString())
-                  .setB(B.toByteString())
-                  .setIndexes(p.getValue1().toIndexes())
-                  .setIndex(p.getValue0())
-                  .build();
-          rObserver.onNext(response);
-        } else if (N > 512){
-          ByteString ABytes = A.toByteString();
-          ByteString BBytes = B.toByteString();
-          response =
-              DataMessage.newBuilder()
-                  .setA(ABytes.substring(0, ABytes.size()/2))
-                  .setB(BBytes.substring(0, BBytes.size()/2))
-                  .setIndexes(p.getValue1().toIndexes())
-                  .setIndex(p.getValue0())
-                  .build();
-          rObserver.onNext(response);
-          
-          response =
-              DataMessage.newBuilder()
-                  .setA(ABytes.substring(ABytes.size()/2))
-                  .setB(ABytes.substring(BBytes.size()/2))
-                  .setIndexes(p.getValue1().toIndexes())
-                  .setIndex(p.getValue0())
-                  .build();
-          rObserver.onNext(response);
-        }
-      } catch (IOException e) {
+        tempC = Matrix.fromByteString(msg.getC());
+      } catch (ClassNotFoundException | IOException e) {
         // TODO Auto-generated catch block
-        LOG.error("Response built incorrectly" + e);
+        LOG.error("Unknown class type" + e);
         e.printStackTrace();
         return;
       }
-      LOG.info("Sent matrix response to worker");
+      
+      if (msg.getIndex() < 5) {
+        C1.incrementFromSubmatrix(tempC, msg.getIndex());
+      } else if (msg.getIndex() < 9) {
+        C2.incrementFromSubmatrix(tempC, msg.getIndex());
+      }
+      ControlMessage response = ControlMessage.newBuilder().setType(ControlMessageType.KILL).setSucceed(true).build();
+      rObserver.onNext(response);
+      LOG.info("Sent success response back to Worker");
       rObserver.onCompleted();
-=======
-    public void discoverWorker(DiscoverRequest discoverRequest, StreamObserver<DiscoverResult> rObserver) {
-      return;
->>>>>>> origin/killworker
+
+      if(queue.isEmpty()){
+        server.shutdown();
+      }
+
     }
+
     // @Override
     // public void requestResource(DataMessage msg, StreamObserver<DataMessage> rObserver) {
     //   // if (queue.getSize() == 0) return;

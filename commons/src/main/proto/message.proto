@@ -17,10 +17,13 @@ package edu.cooper.ece465;
 
 service Coordinator {
   rpc discoverWorker(DiscoverRequest) returns (DiscoverResult) {}
+  
+  rpc requestCompute(ControlMessage) returns (DataMessage) {}
+
+  rpc sendResult(ResultMessage) returns (ControlMessage) {}
 }
 
 service Worker {
-  rpc requestCompute(stream DataMessage) returns (stream DataMessage) {}
 
   rpc control(ControlMessage) returns (ControlMessage) {}
 }
@@ -31,16 +34,17 @@ message DiscoverRequest{
 
 message DiscoverResult{
   int32 workerId = 1;
-message DiscoverRequest{}
-
-message DiscoverResult{
-  int32 workerId =1;
 }
 
 message DataMessage {
   bytes A = 1;
   bytes B = 2;
   int32 index = 3; // 1~8
+}
+
+message ResultMessage {
+  bytes C  = 1;
+  int32 index = 2;
 }
 
 message ControlMessage {
@@ -50,5 +54,5 @@ message ControlMessage {
 
 enum ControlMessageType {
   KILL = 0;
-  CHECK_AVAILABLE = 1;
+  AVAILABLE = 1;
 }

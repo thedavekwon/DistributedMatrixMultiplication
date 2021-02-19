@@ -10,10 +10,13 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.io.IOException;
+import java.lang.ProcessHandle.Info;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.xml.crypto.Data;
 
 import com.google.protobuf.ByteString;
 
@@ -31,62 +34,52 @@ public class Worker {
   }
 
   public void start() throws ClassNotFoundException, IOException {
-    DiscoverRequest message = DiscoverRequest.newBuilder().setIsAvailible(true).build();
+    DiscoverRequest messageDiscover = DiscoverRequest.newBuilder().setIsAvailible(true).build();
     DiscoverResult response;
     try {
-      response = blockingStub.discoverWorker(message);
+      response = blockingStub.discoverWorker(messageDiscover);
+      LOG.info("Sent DiscoverRequest to Coordinator");
     } catch (StatusRuntimeException e) {
       LOG.error("RPC failed " + e);
       return;
     }
-    LOG.info("Recieved DiscoverResult");
+    LOG.info("Recieved DiscoverResult from Coordinator");
     id = response.getWorkerId();
 
-
-    List<DataMessage> responseList = new ArrayList<DataMessage>();
-    while (responses.hasNext()) {
-      responseList.add(responses.next());
+    ControlMessage matrixRequest = ControlMessage.newBuilder().setType(ControlMessageType.AVAILABLE).build();
+    DataMessage matrixResponse;
+    try {
+      matrixResponse = blockingStub.requestCompute(matrixRequest);
+      LOG.info("Sent matrix resource request to Coordinator");
+    } catch (StatusRuntimeException e) {
+    LOG.error("RPC failed " + e);
+    return;
     }
-    LOG.info("Recieved response from coordinator");
-    ByteString subA = responseList.get(0).getA().concat(responseList.get(1).getA());
-    ByteString subB = responseList.get(0).getB().concat(responseList.get(1).getB());
-    Matrix A = Matrix.fromByteString(subA);
-    Matrix B = Matrix.fromByteString(subB);
-    // DataMessage message = DataMessage.newBuilder().build();
-    // DataMessage response;
-    // Iterator<DataMessage> responses;
-    // try {
-    //   // responses = blockingStub.requestResource(message);
-    // } catch (StatusRuntimeException e) {
-    //   LOG.error("RPC failed " + e);
-    //   return;
-    // }
-    // List<DataMessage> responseList = new ArrayList<DataMessage>();
-    // while (responses.hasNext()) {
-    //   responseList.add(responses.next());
-    // }
-    // LOG.info("Recieved response from coordinator");
-    // ByteString subA = responseList.get(0).getA().concat(responseList.get(1).getA());
-    // ByteString subB = responseList.get(0).getB().concat(responseList.get(1).getB());
-    // Matrix A = Matrix.fromByteString(subA);
-    // Matrix B = Matrix.fromByteString(subB);
-    
-    // int index = responseList.get(0).getIndex();
-    // Matrix C = Matrix.like(A);
-    // new ThreadPooledNaiveParallelMultiplication(8)
-    //     .multiply(A, B, C);
-    // DataMessage resultMessage =
-    //     DataMessage.newBuilder()
-    //         .setIndex(index)
-    //         .setA(C.toByteString())
-    //         .build();
-    // LOG.info("Sending response back to coordinator");
-    // try {
-    //   // response = blockingStub.sendResult(resultMessage);
-    // } catch (StatusRuntimeException e) {
-    //   LOG.error("RPC failed " + e);
-    //   return;
-    // }
+    LOG.info("Recieved matrix resource from coordinator");
+    Matrix A = Matrix.fromByteString(matrixResponse.getA());
+    Matrix B = Matrix.fromByteString(matrixResponse.getB());
+    Matrix C = Matrix.like(A);
+
+    new ThreadPooledNaiveParallelMultiplication()
+    .multiply(A, B, C);
+
+    ResultMessage resultMessage =
+    ResultMessage.newBuilder()
+    .setIndex(matrixResponse.getIndex())
+    .setC(C.toByteString())
+    .build();
+    ControlMessage computeResponse;
+    LOG.info("Sending compute result back to Coordinator");
+    try {
+      computeResponse = blockingStub.sendResult(resultMessage);
+      if(!computeResponse.getSucceed()) {
+        LOG.info("Sending computation failed");
+        return;
+      }
+    } catch (StatusRuntimeException e) {
+      LOG.error("RPC failed " + e);
+      return;
+    }
   }
 
   public static void main(String[] args) throws Exception {
@@ -102,29 +95,42 @@ public class Worker {
   }
 
   static class WorkerImpl extends WorkerGrpc.WorkerImplBase {
-    
-    public void requestCompute(DataMessage msg, StreamObserver<DataMessage> rObserver){
+    // private final Logger LOG = Logger.getLogger(WorkerImpl.class);
 
-    @Override
-    public StreamObserver<DataMessage> requestCompute(StreamObserver<DataMessage> rObserver) {
-      return new StreamObserver<DataMessage>() {
-        @Override
-        public void onNext(DataMessage dataMessage) {
-        }
+    // @Override
+    // public StreamObserver<DataMessage> requestCompute(StreamObserver<DataMessage> rObserver) {
+    //   return new StreamObserver<DataMessage>() {
+    //     @Override
+    //     public void onNext(DataMessage dataMessage) {
+    //       try {
+    //         Matrix tempA = Matrix.fromByteString(dataMessage.getA());
+    //         Matrix tempB = Matrix.fromByteString(dataMessage.getB());
+    //       } catch (ClassNotFoundException e) {
+    //         LOG.error("Class not Found");
+    //         e.printStackTrace();
+    //       } catch (IOException e) {
+    //         LOG.error("DataMessage could not be converted");
+    //         e.printStackTrace();
+    //       }
+          
+    //     }
 
-        @Override
-        public void onError(Throwable t) {
-        }
+    //     @Override
+    //     public void onError(Throwable t) {
+    //       LOG.error("Error while returning computation");
+    //     }
 
-        @Override
-        public void onCompleted() {
-        }
-      };
-    }
+    //     @Override
+    //     public void onCompleted() {
+    //       LOG.info("Sent computation back");
+    //       rObserver.onCompleted();
+    //     }
+    //   };
+    // }
 
     @Override
     public void control(ControlMessage controlMessage, StreamObserver<ControlMessage> rObserver) {
-      if (controlMessage.getType() == ControlMessageType.CHECK_AVAILABLE) {
+      if (controlMessage.getType() == ControlMessageType.AVAILABLE) {
 
       } else if (controlMessage.getType() == ControlMessageType.KILL) {
         

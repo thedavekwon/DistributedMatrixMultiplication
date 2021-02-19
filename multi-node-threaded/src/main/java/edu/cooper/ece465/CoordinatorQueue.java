@@ -14,4 +14,16 @@ public class CoordinatorQueue {
       taskQueue.add(i);
     }
   }
+
+  public void removeTask(int index) {
+    taskQueue.remove(index);
+  }
+
+  public Boolean isEmpty() {
+    return taskQueue.isEmpty();
+  }
+
+  public int selectTask() {
+    return taskQueue.peek();
+  }
 }
