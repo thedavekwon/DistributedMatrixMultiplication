@@ -87,6 +87,20 @@ public class Coordinator {
     }
 
     @Override
+    public void workAvailble(FlowMessage request, StreamObserver<FlowMessage> rObserver) {
+      if(!(request.getIsWorkAvailble())) return;
+      LOG.info("Recieved workAvailible from Worker");
+      Boolean check = true;
+      if (queue.isEmpty()){
+        check = false;
+      }
+      FlowMessage response = FlowMessage.newBuilder().setIsWorkAvailble(check).build();
+      rObserver.onNext(response);
+      LOG.info("Sent workAvaible response to Worker");
+      rObserver.onCompleted();
+    }
+
+    @Override
     public void requestCompute(ControlMessage controlMessage, StreamObserver<DataMessage> rObserver) {
       if(queue.isEmpty()) return;
       if(!(controlMessage.getType() == ControlMessageType.AVAILABLE)) return;

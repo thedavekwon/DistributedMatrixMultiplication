@@ -18,14 +18,11 @@ package edu.cooper.ece465;
 service Coordinator {
   rpc discoverWorker(DiscoverRequest) returns (DiscoverResult) {}
   
+  rpc workAvailble(FlowMessage) returns (FlowMessage) {}
+  
   rpc requestCompute(ControlMessage) returns (DataMessage) {}
 
   rpc sendResult(ResultMessage) returns (ControlMessage) {}
-}
-
-service Worker {
-
-  rpc control(ControlMessage) returns (ControlMessage) {}
 }
 
 message DiscoverRequest{
@@ -50,6 +47,10 @@ message ResultMessage {
 message ControlMessage {
   ControlMessageType type = 1;
   bool succeed = 2;
+}
+
+message FlowMessage {
+  bool isWorkAvailble = 1;
 }
 
 enum ControlMessageType {
