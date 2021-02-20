@@ -3,38 +3,57 @@ option java_multiple_files = true;
 package edu.cooper.ece465;
 
 service Coordinator {
-  rpc replyHeartBeat(HeartBeatRequest) returns (HeartBeatReply) {}
+  // Workers notify the coordinator that it has spawned and receive worker id from the coordinator. 
+  rpc discoverWorker(DiscoverRequest) returns (DiscoverResult) {}
+  
+  // Workers request submatrix to compute. It receives Matrix A, Matrix B, and split index. 
+  // It computes the submatrix multiplication. It continuously request new submatrix until
+  // there is no task left for coordinator. 
+  rpc requestTask(ControlMessage) returns (DataMessage) {}
 
-  rpc requestResource(DataMessage) returns (DataMessage) {}
-
-  rpc sendResult(DataMessage) returns (DataMessage) {}
+  // Workers send computed result back to the coordinator. It indicates wheter the computation
+  // succeed and failed to the coordinator so that the coordinator can reassign a failed task. 
+  rpc sendResult(ResultMessage) returns (ControlMessage) {}
 }
 
-message HeartBeatRequest {}
+message DiscoverRequest{}
 
-message HeartBeatReply {}
+message DiscoverResult{
+  // An unique worker id assigned by coordinator
+  int32 workerId = 1;  
+}
 
 message DataMessage {
+  // Matrix A
   bytes A = 1;
+  // Matrix B
   bytes B = 2;
+  // Split Index from 1 to 8
   int32 index = 3;
-  Indexes indexes = 4;
-  DataMessageType type = 5;
+  // Indication of whether there is a leftover task
+  bool isWorkAvailable = 4;
 }
 
-message Indexes {
-  int32 A_i = 1;
-  int32 A_j = 2;
-  int32 B_i = 3;
-  int32 B_j = 4;
-  int32 C_i = 5;
-  int32 C_j = 6;
-  int32 size = 7;
+message ResultMessage {
+  // Matrix C
+  bytes C  = 1;
+  // Split Index from 1 to 8
+  int32 index = 2; // 1~8
+  // Indication of whether a computation failed or succeed
+  ResultMessageType type = 3;
+  int32 workerId = 4;
 }
 
-enum DataMessageType {
-  SEND_REQUEST = 0;
-  REPLY_REQUEST = 1;
-  SEND_RESULT = 2;
-  REPLY_RESULT = 3;
+enum ResultMessageType {
+  FAILED = 0;
+  SUCCEED = 1;
+}
+
+message ControlMessage {
+  ControlMessageType type = 1;
+  int32 workerId = 2;
+}
+
+enum ControlMessageType {
+  AVAILABLE = 0;
 }

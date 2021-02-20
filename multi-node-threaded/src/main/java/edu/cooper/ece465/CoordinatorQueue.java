@@ -1,46 +1,32 @@
 package edu.cooper.ece465;
 
-import edu.cooper.ece465.commons.Matrix.MatrixIndexes;
 import java.util.concurrent.ArrayBlockingQueue;
-import org.javatuples.Pair;
-import lombok.Getter;
 
 public class CoordinatorQueue {
-  private int N;
-  @Getter private int count;
-  @Getter private int i;
-  private ArrayBlockingQueue<MatrixIndexes> queue;
+  private ArrayBlockingQueue<Integer> taskQueue;
 
-  public CoordinatorQueue(int N_) {
-    i = 0;
-    count = 0;
-    N = N_ / 2;
-    queue = new ArrayBlockingQueue<MatrixIndexes>(8);
-    
-    queue.add(new MatrixIndexes(0, 0, 0, 0, 0, 0, N));
-    queue.add(new MatrixIndexes(0, 0 + N, 0, 0 + N, 0, 0 + N, N));
-    queue.add(new MatrixIndexes(0 + N, 0, 0, 0, 0 + N, 0, N));
-    queue.add(new MatrixIndexes(0 + N, 0, 0, 0 + N, 0 + N, 0 + N, N));
-    queue.add(new MatrixIndexes(0, 0 + N, 0 + N, 0, 0, 0, N));
-    queue.add(new MatrixIndexes(0, 0 + N, 0 + N, 0 + N, 0, 0 + N, N));
-    queue.add(new MatrixIndexes(0 + N, 0 + N, 0 + N, 0, 0 + N, 0, N));
-    queue.add(new MatrixIndexes(0 + N, 0 + N, 0 + N, 0 + N, 0 + N, 0 + N, N));
+  private int workerId = 0;
+
+  public CoordinatorQueue() {
+    taskQueue = new ArrayBlockingQueue<Integer>(8);
+    for (int i = 1; i < 9; i++) {
+      taskQueue.add(i);
+    }
   }
 
-  public synchronized Pair<Integer, MatrixIndexes> poll() {
-    i++;
-    return new Pair<Integer, MatrixIndexes>(i, queue.poll());
+  public synchronized int getCurrentWorkerId() {
+    return ++workerId;
   }
 
-  public synchronized int getSize() {
-    return queue.size();
+  public synchronized void push(int index) {
+    taskQueue.add(index);
   }
 
-  public synchronized void incrementCount() {
-    count++;
+  public synchronized Boolean isEmpty() {
+    return taskQueue.isEmpty();
   }
 
-  public Boolean isDone() {
-    return count == 8;
+  public synchronized Integer pop() {
+    return taskQueue.poll();
   }
 }

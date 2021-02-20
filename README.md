@@ -27,6 +27,16 @@ cd DistributedMatrixMultiplication
 
 # Single Node Threaded
 java -cp single-node-threaded/target/single-node-threaded-0.0.1-jar-with-dependencies.jar edu.cooper.ece465.App 
+
+# Multi Node Threaded
+# Coordinator
+java -cp multi-node-threaded/target/multi-node-threaded-0.0.1-jar-with-dependencies.jar edu.cooper.ece465.Coordinator
+
+# Worker
+java -cp multi-node-threaded/target/multi-node-threaded-0.0.1-jar-with-dependencies.jar edu.cooper.ece465.Worker
+
+# Coordinator and 3 Workers
+./run.sh
 ```
 
 ## References

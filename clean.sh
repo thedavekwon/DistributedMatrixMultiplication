@@ -7,6 +7,8 @@ echo "Removing built project artifacts..."
 
 echo "Removing previous outputs"
 /bin/rm output.csv
+/bin/rm logs/runner.log
+touch logs/runner.log
 
 echo "Done."
 echo "Maven build clean..."
