@@ -46,7 +46,7 @@ public class Worker {
         ControlMessage.newBuilder().setType(ControlMessageType.AVAILABLE).setWorkerId(id).build();
     DataMessage matrixResponse;
     try {
-      matrixResponse = blockingStub.requestCompute(matrixRequest);
+      matrixResponse = blockingStub.requestTask(matrixRequest);
       LOG.info("Sent matrix resource request to Coordinator");
     } catch (StatusRuntimeException e) {
       LOG.error("RPC failed " + e);
@@ -93,7 +93,7 @@ public class Worker {
         LOG.error(e);
       }
       try {
-        matrixResponse = blockingStub.requestCompute(matrixRequest);
+        matrixResponse = blockingStub.requestTask(matrixRequest);
         LOG.info("Sent matrix resource request to Coordinator");
       } catch (StatusRuntimeException e) {
         LOG.error("RPC failed " + e);

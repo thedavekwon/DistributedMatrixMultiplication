@@ -5,7 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class CoordinatorQueue {
   private ArrayBlockingQueue<Integer> taskQueue;
 
-  private int workerId;
+  private int workerId = 0;
 
   public CoordinatorQueue() {
     taskQueue = new ArrayBlockingQueue<Integer>(8);
@@ -26,7 +26,7 @@ public class CoordinatorQueue {
     return taskQueue.isEmpty();
   }
 
-  public synchronized int pop() {
+  public synchronized Integer pop() {
     return taskQueue.poll();
   }
 }

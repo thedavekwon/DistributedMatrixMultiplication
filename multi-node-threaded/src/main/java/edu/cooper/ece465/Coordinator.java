@@ -1,5 +1,6 @@
 package edu.cooper.ece465;
 
+import com.google.protobuf.ByteString;
 import edu.cooper.ece465.commons.Matrix;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -89,19 +90,19 @@ public class Coordinator {
       DiscoverResult response =
           DiscoverResult.newBuilder().setWorkerId(queue.getCurrentWorkerId()).build();
       rObserver.onNext(response);
-      LOG.info("Sent DiscoverResult response to Worker");
+      LOG.info("Sent DiscoverResult response to Worker " + response.getWorkerId());
       rObserver.onCompleted();
     }
 
     @Override
-    public void requestCompute(ControlMessage msg, StreamObserver<DataMessage> rObserver) {
+    public void requestTask(ControlMessage msg, StreamObserver<DataMessage> rObserver) {
       if (!(msg.getType() == ControlMessageType.AVAILABLE)) return;
       if (queue.isEmpty()) {
         try {
           DataMessage response = DataMessage.newBuilder().setIsWorkAvailable(false).build();
           rObserver.onNext(response);
         } catch (Exception e) {
-          LOG.error("requestCompute response could not be sent");
+          LOG.error("requestTask response could not be sent");
           e.printStackTrace();
         }
         LOG.info("Empty Task Queue");
@@ -125,7 +126,19 @@ public class Coordinator {
       Matrix tempA;
       Matrix tempB;
 
-      int taskNum = queue.pop();
+      Integer taskNum = queue.pop();
+      if (taskNum == null) {
+        try {
+          DataMessage response = DataMessage.newBuilder().setIsWorkAvailable(false).build();
+          rObserver.onNext(response);
+        } catch (Exception e) {
+          LOG.error("requestTask response could not be sent");
+          e.printStackTrace();
+        }
+        LOG.info("Empty Task Queue");
+        rObserver.onCompleted();
+        return;
+      }
       if (taskNum == 1) {
         tempA = A11;
         tempB = B11;
@@ -151,20 +164,31 @@ public class Coordinator {
         tempA = A22;
         tempB = B22;
       }
+      ByteString tempAByteString;
+      ByteString tempBByteString;
+      try {
+        tempAByteString = tempA.toByteString();
+        tempBByteString = tempB.toByteString();
+      } catch (Exception e) {
+        LOG.error("failed to convert matrix to bytestring");
+        return;
+      }
+      LOG.info("Matrix A compressed bytestring size: " + tempAByteString.size() + " bytes");
+      LOG.info("Matrix B compressed bytestring size: " + tempBByteString.size() + " bytes");
       try {
         DataMessage response =
             DataMessage.newBuilder()
-                .setA(tempA.toByteString())
-                .setB(tempB.toByteString())
+                .setA(tempAByteString)
+                .setB(tempBByteString)
                 .setIndex(taskNum)
                 .setIsWorkAvailable(true)
                 .build();
         rObserver.onNext(response);
       } catch (Exception e) {
-        LOG.error("requestCompute response could not be sent");
+        LOG.error("requestTask response could not be sent");
         e.printStackTrace();
-      }
-      LOG.info("Sent matrix resource to Worker");
+    }
+      LOG.info("Sent matrix resource to Worker " + msg.getWorkerId());
       rObserver.onCompleted();
     }
 
@@ -190,7 +214,7 @@ public class Coordinator {
         taskFinishedQueue.add(msg.getIndex());
         ControlMessage response = ControlMessage.newBuilder().build();
         rObserver.onNext(response);
-        LOG.info("Sent success response back to Worker");
+        LOG.info("Sent success response back to Worker " + msg.getWorkerId());
         rObserver.onCompleted();
         if (taskFinishedQueue.size() == 8) {
           server.shutdown();

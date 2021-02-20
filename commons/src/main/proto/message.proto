@@ -3,29 +3,43 @@ option java_multiple_files = true;
 package edu.cooper.ece465;
 
 service Coordinator {
+  // Workers notify the coordinator that it has spawned and receive worker id from the coordinator. 
   rpc discoverWorker(DiscoverRequest) returns (DiscoverResult) {}
-    
-  rpc requestCompute(ControlMessage) returns (DataMessage) {}
+  
+  // Workers request submatrix to compute. It receives Matrix A, Matrix B, and split index. 
+  // It computes the submatrix multiplication. It continuously request new submatrix until
+  // there is no task left for coordinator. 
+  rpc requestTask(ControlMessage) returns (DataMessage) {}
 
+  // Workers send computed result back to the coordinator. It indicates wheter the computation
+  // succeed and failed to the coordinator so that the coordinator can reassign a failed task. 
   rpc sendResult(ResultMessage) returns (ControlMessage) {}
 }
 
 message DiscoverRequest{}
 
 message DiscoverResult{
-  int32 workerId = 1;
+  // An unique worker id assigned by coordinator
+  int32 workerId = 1;  
 }
 
 message DataMessage {
+  // Matrix A
   bytes A = 1;
+  // Matrix B
   bytes B = 2;
-  int32 index = 3; // 1~8
+  // Split Index from 1 to 8
+  int32 index = 3;
+  // Indication of whether there is a leftover task
   bool isWorkAvailable = 4;
 }
 
 message ResultMessage {
+  // Matrix C
   bytes C  = 1;
+  // Split Index from 1 to 8
   int32 index = 2; // 1~8
+  // Indication of whether a computation failed or succeed
   ResultMessageType type = 3;
   int32 workerId = 4;
 }
