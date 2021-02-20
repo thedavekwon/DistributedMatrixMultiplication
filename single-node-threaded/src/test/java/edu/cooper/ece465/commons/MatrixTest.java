@@ -2,8 +2,8 @@ package edu.cooper.ece465.commons;
 
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
 import org.javatuples.Quartet;
+import org.junit.Test;
 
 public class MatrixTest {
   private static int N = 4;
@@ -82,7 +82,7 @@ public class MatrixTest {
     Quartet<Matrix, Matrix, Matrix, Matrix> matrices = m.split4();
 
     for (int i = 1; i < 5; i++) {
-      Matrix t = (Matrix) matrices.getValue(i-1);
+      Matrix t = (Matrix) matrices.getValue(i - 1);
       for (int j = 0; j < 2; j++) {
         for (int k = 0; k < 2; k++) {
           assertTrue(t.getValue(j, k) == i);

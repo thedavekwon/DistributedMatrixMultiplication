@@ -2,32 +2,15 @@ syntax = "proto3";
 option java_multiple_files = true;
 package edu.cooper.ece465;
 
-// compress before making into bytestream
-// send partial
-// timeout for fault tolerant
-// compressing huffman coding
-
-// 1. Workers send their availability to the coordinator
-// 2. The coordinator stores available workers as a worker pool
-// 3. The coordinator sends each split to the available worker with a timeout
-// 4. A worker compute the split and sends the result back to the coordinator
-// 5. If the worker fails to compute (time out), the coordinator sends the split to other worker
-// 6. The coordinator adds all the computed splits, and return the results
-// 7. The coordinator sends computation done message to all workers and wait until confirmation
-
 service Coordinator {
   rpc discoverWorker(DiscoverRequest) returns (DiscoverResult) {}
-  
-  rpc workAvailble(FlowMessage) returns (FlowMessage) {}
-  
+    
   rpc requestCompute(ControlMessage) returns (DataMessage) {}
 
   rpc sendResult(ResultMessage) returns (ControlMessage) {}
 }
 
-message DiscoverRequest{
-  bool isAvailible = 1;
-}
+message DiscoverRequest{}
 
 message DiscoverResult{
   int32 workerId = 1;
@@ -37,23 +20,26 @@ message DataMessage {
   bytes A = 1;
   bytes B = 2;
   int32 index = 3; // 1~8
+  bool isWorkAvailable = 4;
 }
 
 message ResultMessage {
   bytes C  = 1;
-  int32 index = 2;
+  int32 index = 2; // 1~8
+  ResultMessageType type = 3;
+  int32 workerId = 4;
+}
+
+enum ResultMessageType {
+  FAILED = 0;
+  SUCCEED = 1;
 }
 
 message ControlMessage {
   ControlMessageType type = 1;
-  bool succeed = 2;
-}
-
-message FlowMessage {
-  bool isWorkAvailble = 1;
+  int32 workerId = 2;
 }
 
 enum ControlMessageType {
-  KILL = 0;
-  AVAILABLE = 1;
+  AVAILABLE = 0;
 }

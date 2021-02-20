@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.javatuples.Quartet;
 
@@ -80,21 +79,21 @@ public class Matrix implements Serializable {
     if (idx == 1) {
       i_start = 0;
       j_start = 0;
-      i_end = row/2;
-      j_end = col/2;
+      i_end = row / 2;
+      j_end = col / 2;
     } else if (idx == 2) {
       i_start = 0;
-      j_start = col/2;
-      i_end = row/2;
+      j_start = col / 2;
+      i_end = row / 2;
       j_end = col;
     } else if (idx == 3) {
-      i_start = row/2;
+      i_start = row / 2;
       j_start = 0;
       i_end = row;
-      j_end = col/2;
+      j_end = col / 2;
     } else {
-      i_start = row/2;
-      j_start = col/2;
+      i_start = row / 2;
+      j_start = col / 2;
       i_end = row;
       j_end = col;
     }
@@ -102,12 +101,12 @@ public class Matrix implements Serializable {
   }
 
   public Matrix splitWithIndex(int idx) {
-    assert idx<=8 && idx >=1;
+    assert idx <= 8 && idx >= 1;
     Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
-    Matrix m = new Matrix(row/2, col/2);
-    for (int i = 0; i < row/2; i++) {
-      for (int j = 0; j < col/2; j++) {
-        m.setValue(i, j, array[i+indices.getValue0()][j+indices.getValue1()]);
+    Matrix m = new Matrix(row / 2, col / 2);
+    for (int i = 0; i < row / 2; i++) {
+      for (int j = 0; j < col / 2; j++) {
+        m.setValue(i, j, array[i + indices.getValue0()][j + indices.getValue1()]);
       }
     }
     return m;
@@ -175,7 +174,7 @@ public class Matrix implements Serializable {
     Quartet<Integer, Integer, Integer, Integer> indices = getSplitIndex(idx);
     for (int i = indices.getValue0(); i < indices.getValue2(); i++) {
       for (int j = indices.getValue1(); j < indices.getValue3(); j++) {
-        incrementValue(i, j, m.getValue(i-indices.getValue0(), j-indices.getValue1()));
+        incrementValue(i, j, m.getValue(i - indices.getValue0(), j - indices.getValue1()));
       }
     }
   }
