@@ -4,7 +4,12 @@ import edu.cooper.ece465.commons.Matrix;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -31,10 +36,14 @@ public class Coordinator {
   private static Server server;
 
   private void start() throws IOException {
-    int port = 8080;
-    server = ServerBuilder.forPort(port).addService(new CoordinatorImpl()).build().start();
+    String propFileName = "grpc.properties";
+    Properties p = new Properties();
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+    p.load(inputStream);
 
-    LOG.info("Coordinator started on " + port);
+    server = ServerBuilder.forPort(Integer.parseInt(p.getProperty("port"))).addService(new CoordinatorImpl()).build().start();
+
+    LOG.info("Coordinator started on " + Integer.parseInt(p.getProperty("port")));
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread() {
